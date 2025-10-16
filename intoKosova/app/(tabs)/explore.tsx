@@ -58,3 +58,70 @@ const explorationCategories = [
     items: ["Hiking Trails", "Rock Climbing", "Winter Sports"]
   }
 ];
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    alignItems: 'center', // Center the header content
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 8,
+    textAlign: 'center', // Center the title text
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    lineHeight: 22,
+    textAlign: 'center', // Center the subtitle text
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  // Add color strip like home page
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 24,
+    paddingVertical: 16,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+      web: {
+        boxShadow: '0 4px 16px rgba(49, 130, 206, 0.15)',
+      },
+    }),
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
