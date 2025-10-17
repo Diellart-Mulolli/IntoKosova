@@ -198,3 +198,98 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
+export default function ProfileScreen() {
+  const theme = useTheme();
+
+  const renderProfileOption = (option: typeof profileOptions[0], index: number) => {
+    return (
+      <Animated.View
+        key={option.id}
+        entering={FadeInDown.delay(index * 100).springify()}
+      >
+        <Pressable
+          style={styles.optionCard}
+          onPress={() => console.log(`Option pressed: ${option.title}`)}
+          android_ripple={{ color: colors.lightBlue }}
+        >
+          <View style={[styles.optionContent, { borderLeftColor: option.color }]}>
+            <View style={styles.optionHeader}>
+              <View style={[styles.optionIcon, { backgroundColor: `${option.color}20` }]}>
+                <IconSymbol
+                  name={option.icon}
+                  size={28}
+                  color={option.color}
+                />
+              </View>
+              <View style={styles.optionTextContainer}>
+                <Text style={styles.optionTitle}>{option.title}</Text>
+                <Text style={styles.optionDescription}>{option.description}</Text>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+      </Animated.View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <Animated.View entering={FadeInUp.springify()} style={styles.header}>
+        <View style={styles.profileImage}>
+          <IconSymbol
+            name="person.fill"
+            size={40}
+            color="#FFFFFF"
+          />
+        </View>
+        <Text style={styles.profileName}>Kosovo Explorer</Text>
+        <Text style={styles.profileEmail}>explorer@intokosova.com</Text>
+        <View style={styles.profileStats}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statLabel}>Places Visited</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>8</Text>
+            <Text style={styles.statLabel}>Favorites</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>24</Text>
+            <Text style={styles.statLabel}>Photos</Text>
+          </View>
+        </View>
+      </Animated.View>
+
+      <ScrollView 
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
+        <Animated.View 
+          entering={FadeInUp.delay(200).springify()}
+          style={styles.statsContainer}
+        >
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statLabel}>Places{'\n'}Visited</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>8</Text>
+            <Text style={styles.statLabel}>Saved{'\n'}Favorites</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>24</Text>
+            <Text style={styles.statLabel}>Photos{'\n'}Taken</Text>
+          </View>
+        </Animated.View>
+
+        <View style={styles.optionsContainer}>
+          {profileOptions.map((option, index) => 
+            renderProfileOption(option, index)
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
