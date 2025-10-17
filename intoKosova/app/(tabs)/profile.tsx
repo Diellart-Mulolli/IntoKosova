@@ -1,5 +1,5 @@
 import React from "react";
-import { IconSymbol } from "@/components/IconSymbol";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { View, Text, StyleSheet, ScrollView, Platform, Pressable } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { colors, commonStyles } from "@/styles/commonStyles";
