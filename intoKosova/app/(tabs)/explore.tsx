@@ -130,3 +130,173 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: "center",
   },
+  categoriesContainer: {
+    paddingBottom: 100,
+  },
+  categoryCard: {
+    width: "100%",
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+      web: {
+        boxShadow: "0 6px 20px rgba(49, 130, 206, 0.15)",
+      },
+    }),
+  },
+  categoryContent: {
+    padding: 20,
+    backgroundColor: colors.card,
+    minHeight: 120,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.lightBlue,
+  },
+  categoryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  categoryIcon: {
+    marginRight: 16,
+    padding: 12,
+    backgroundColor: colors.lightBlue,
+    borderRadius: 12,
+  },
+  categoryTextContainer: {
+    flex: 1,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.text,
+    marginBottom: 4,
+  },
+  categoryDescription: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  categoryItems: {
+    marginTop: 8,
+  },
+  categoryItem: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 2,
+    opacity: 0.8,
+  },
+});
+
+export default function ExplorationScreen() {
+  const theme = useTheme();
+
+  const renderCategoryCard = (
+    category: (typeof explorationCategories)[0],
+    index: number
+  ) => {
+    return (
+      <Animated.View
+        key={category.id}
+        entering={FadeInDown.delay(index * 100).springify()}
+      >
+        <Pressable
+          style={styles.categoryCard}
+          onPress={() => console.log(`Exploring ${category.title}`)}
+          android_ripple={{ color: colors.lightBlue }}
+        >
+          <View
+            style={[
+              styles.categoryContent,
+              { borderLeftColor: category.color },
+            ]}
+          >
+            <View style={styles.categoryHeader}>
+              <View
+                style={[
+                  styles.categoryIcon,
+                  { backgroundColor: `${category.color}20` },
+                ]}
+              >
+                <IconSymbol
+                  name={category.icon}
+                  size={28}
+                  color={category.color}
+                />
+              </View>
+              <View style={styles.categoryTextContainer}>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
+                <Text style={styles.categoryDescription}>
+                  {category.description}
+                </Text>
+                <View style={styles.categoryItems}>
+                  {category.items.slice(0, 2).map((item, idx) => (
+                    <Text key={idx} style={styles.categoryItem}>
+                      • {item}
+                    </Text>
+                  ))}
+                  {category.items.length > 2 && (
+                    <Text style={styles.categoryItem}>
+                      • +{category.items.length - 2} more
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+      </Animated.View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <Animated.View entering={FadeInUp.springify()} style={styles.header}>
+        <Text style={styles.headerTitle}>Explore Kosovo</Text>
+        <Text style={styles.headerSubtitle}>
+          Discover the hidden gems and rich culture of Kosovo through various
+          categories
+        </Text>
+      </Animated.View>
+
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
+        <Animated.View
+          entering={FadeInUp.delay(200).springify()}
+          style={styles.statsContainer}
+        >
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>50+</Text>
+            <Text style={styles.statLabel}>Historical{"\n"}Sites</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>25+</Text>
+            <Text style={styles.statLabel}>Natural{"\n"}Wonders</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>100+</Text>
+            <Text style={styles.statLabel}>Cultural{"\n"}Experiences</Text>
+          </View>
+        </Animated.View>
+
+        <View style={styles.categoriesContainer}>
+          {explorationCategories.map((category, index) =>
+            renderCategoryCard(category, index)
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
