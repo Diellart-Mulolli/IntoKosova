@@ -198,6 +198,80 @@ export default function ExplorationScreen() {
         key={category.id}
         entering={FadeInDown.delay(index * 100).springify()}
       >
+        <Pressable
+          style={styles.categoryCard}
+          onPress={() => console.log(`Exploring ${category.title}`)}
+          android_ripple={{ color: colors.lightBlue }}
+        >
+          <View style={[styles.categoryContent, { borderLeftColor: category.color }]}>
+            <View style={styles.categoryHeader}>
+              <View style={[styles.categoryIcon, { backgroundColor: `${category.color}20` }]}>
+                <IconSymbol
+                  name={category.icon}
+                  size={28}
+                  color={category.color}
+                />
+              </View>
+              <View style={styles.categoryTextContainer}>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
+                <Text style={styles.categoryDescription}>{category.description}</Text>
+                <View style={styles.categoryItems}>
+                  {category.items.slice(0, 2).map((item, idx) => (
+                    <Text key={idx} style={styles.categoryItem}>• {item}</Text>
+                  ))}
+                  {category.items.length > 2 && (
+                    <Text style={styles.categoryItem}>• +{category.items.length - 2} more</Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+      </Animated.View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <Animated.View entering={FadeInUp.springify()} style={styles.header}>
+        <Text style={styles.headerTitle}>Explore Kosovo</Text>
+        <Text style={styles.headerSubtitle}>
+          Discover the hidden gems and rich culture of Kosovo through various categories
+        </Text>
+      </Animated.View>
+
+      <ScrollView 
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
+        <Animated.View 
+          entering={FadeInUp.delay(200).springify()}
+          style={styles.statsContainer}
+        >
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>50+</Text>
+            <Text style={styles.statLabel}>Historical{'\n'}Sites</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>25+</Text>
+            <Text style={styles.statLabel}>Natural{'\n'}Wonders</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>100+</Text>
+            <Text style={styles.statLabel}>Cultural{'\n'}Experiences</Text>
+          </View>
+        </Animated.View>
+
+        <View style={styles.categoriesContainer}>
+          {explorationCategories.map((category, index) => 
+            renderCategoryCard(category, index)
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
 
 
   categoryCard: {
