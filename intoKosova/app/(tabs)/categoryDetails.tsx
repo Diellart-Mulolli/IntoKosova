@@ -7,11 +7,13 @@ import {
   Dimensions,
   Platform,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { colors } from "@/styles/commonStyles";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -87,10 +89,25 @@ const categories = [
 export default function CategoryDetails() {
   const { id } = useLocalSearchParams();
   const category = categories.find((c) => c.id == id);
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
+      {/* 🔹 Floating Back Arrow */}
+      <View style={styles.floatingBackContainer}>
+        <View style={styles.backButtonContainer}>
+          <Pressable onPress={() => router.replace("/explore")} style={styles.backButton}>
+            <Ionicons
+              name="arrow-back"
+              size={26}
+              color={category?.color || colors.primary}
+            />
+          </Pressable>
+        </View>
+      </View>
+
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* 🔹 Header Section */}
         <Animated.View entering={FadeInUp.springify()} style={styles.header}>
           <Text style={[styles.headerTitle, { color: category?.color }]}>
             {category?.title}
@@ -98,6 +115,7 @@ export default function CategoryDetails() {
           <Text style={styles.headerSubtitle}>{category?.description}</Text>
         </Animated.View>
 
+        {/* 🔹 Image Cards */}
         <View style={styles.cardsContainer}>
           {category?.items.map((item, index) => (
             <Animated.View
@@ -108,7 +126,7 @@ export default function CategoryDetails() {
               <Image
                 source={item.image}
                 style={styles.image}
-                resizeMode="cover" // ✅ mbulon kartën pa boshllëqe
+                resizeMode="cover"
               />
               <View style={styles.overlay} />
               <Text style={styles.imageText}>{item.name}</Text>
@@ -124,11 +142,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingHorizontal: 20,
   },
+
+  floatingBackContainer: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    zIndex: 50,
+  },
+  backButtonContainer: {
+    backgroundColor: "rgba(255,255,255,0.6)",
+    borderRadius: 22,
+    overflow: "hidden",
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 22,
+  },
+
   header: {
     alignItems: "center",
-    paddingTop: 20,
+    paddingTop: 80,
     paddingBottom: 16,
   },
   headerTitle: {
@@ -144,7 +181,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     maxWidth: "90%",
   },
+
   cardsContainer: {
+    paddingHorizontal: 20,
     paddingBottom: 40,
   },
   card: {
@@ -166,9 +205,8 @@ const styles = StyleSheet.create({
     }),
   },
   image: {
-    width: "100%",
-    height: 240, // ✅ kufizon lartësinë për të ruajtur raportin
-    borderRadius: 0,
+    width: width - 40,
+    height: 240,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
