@@ -45,7 +45,7 @@ export default function TabLayout() {
           justifyContent: 'space-around',
         },
         tabBarBackground: () => (
-          <View style={[styles.tabBackground, { pointerEvents: 'none' }]}> 
+          <View style={[styles.tabBackground, { pointerEvents: 'none' }]}>
             <GlassView tintColor={Colors[colorScheme ?? 'light'].background} style={styles.glassContainer} />
           </View>
         ),
@@ -62,7 +62,7 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />, 
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -70,13 +70,6 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="modal"
-        options={{
-          title: 'Modal',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="info.circle" color={color} />,
         }}
       />
     </Tabs>
