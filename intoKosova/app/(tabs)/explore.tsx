@@ -21,7 +21,7 @@ const explorationCategories = [
     description: "Discover Kosovo's rich historical heritage",
     icon: "building.columns.fill",
     color: colors.primary,
-    items: ["Gračanica Monastery", "Visoki Dečani", "Patriarchate of Peć"],
+    items: ["Graçanica Monastery", "Deçan Monastery", "Patriarchate of Peja"],
   },
   {
     id: 2,
