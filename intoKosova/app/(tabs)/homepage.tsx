@@ -54,20 +54,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
-    alignItems: 'center', // Center the header content
+    alignItems: 'center', 
   },
   titleText: {
     fontSize: 32,
     fontWeight: 'bold',
     color: colors.text,
     marginBottom: 8,
-    textAlign: 'center', // Center the title text
+    textAlign: 'center', 
   },
   subtitleText: {
     fontSize: 16,
     color: colors.textSecondary,
     lineHeight: 22,
-    textAlign: 'center', // Center the subtitle text
+    textAlign: 'center', 
   },
   content: {
     flex: 1,
@@ -113,10 +113,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   featuresContainer: {
-    paddingBottom: 100, // Space for floating tab bar
+    paddingBottom: 100, 
   },
   featureCard: {
-    width: '100%', // Full width cards
+    width: '100%', 
     marginBottom: 16,
     borderRadius: 16,
     overflow: 'hidden',

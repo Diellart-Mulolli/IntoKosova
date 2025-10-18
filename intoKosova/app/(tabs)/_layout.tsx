@@ -5,7 +5,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { GlassView } from 'expo-glass-effect';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 
 const TAB_BAR_HEIGHT = 64;
 
@@ -40,16 +40,17 @@ export default function TabLayout() {
           backgroundColor: 'transparent',
           borderTopWidth: 0,
           elevation: 0,
+          paddingHorizontal: 0,
+          flexDirection: 'row',
+          justifyContent: 'space-around',
         },
-        // render a glass background behind the tab bar
         tabBarBackground: () => (
-          <View style={styles.tabBackground} pointerEvents="none">
+          <View style={[styles.tabBackground, { pointerEvents: 'none' }]}> 
             <GlassView tintColor={Colors[colorScheme ?? 'light'].background} style={styles.glassContainer} />
           </View>
         ),
       }}
     >
-      {/* Put homepage first */}
       <Tabs.Screen
         name="homepage"
         options={{
@@ -57,20 +58,25 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
-
       <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />, 
         }}
       />
-
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="modal"
+        options={{
+          title: 'Modal',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="info.circle" color={color} />,
         }}
       />
     </Tabs>
