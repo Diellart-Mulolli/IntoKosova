@@ -1,251 +1,426 @@
-import React from "react";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { View, Text, StyleSheet, ScrollView, Platform, Pressable } from "react-native";
-import { useTheme } from "@react-navigation/native";
-import { colors, commonStyles } from "@/styles/commonStyles";
-import { GlassView } from "expo-glass-effect";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  TextInput,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-
-const profileOptions = [
-  {
-    id: 1,
-    title: "My Favorites",
-    description: "Places you've saved for later",
-    icon: "heart.fill",
-    color: colors.secondary,
-  },
-  {
-    id: 2,
-    title: "Travel History",
-    description: "Your Kosovo exploration journey",
-    icon: "map.fill",
-    color: colors.accent,
-  },
-  {
-    id: 3,
-    title: "Language Settings",
-    description: "Albanian, English",
-    icon: "globe",
-    color: colors.primary,
-  },
-  {
-    id: 4,
-    title: "Offline Maps",
-    description: "Download maps for offline use",
-    icon: "arrow.down.circle.fill",
-    color: colors.highlight,
-  },
-  {
-    id: 5,
-    title: "Share App",
-    description: "Tell friends about intoKosova",
-    icon: "square.and.arrow.up.fill",
-    color: "#FF6B6B",
-  },
-  {
-    id: 6,
-    title: "Support",
-    description: "Get help and contact us",
-    icon: "questionmark.circle.fill",
-    color: "#4ECDC4",
-  },
-];
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '0 4px 16px rgba(49, 130, 206, 0.15)',
-      },
-    }),
-  },
-  profileName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  profileEmail: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
-  profileStats: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 24,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  // Add color strip like home page
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 24,
-    paddingVertical: 16,
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '0 4px 16px rgba(49, 130, 206, 0.15)',
-      },
-    }),
-  },
-  optionsContainer: {
-    paddingBottom: 100, // Space for floating tab bar
-  },
-  optionCard: {
-    width: '100%', // Full width like home page
-    marginBottom: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 6,
-      },
-      web: {
-        boxShadow: '0 6px 20px rgba(49, 130, 206, 0.15)',
-      },
-    }),
-  },
-  optionContent: {
-    padding: 20,
-    backgroundColor: colors.card,
-    minHeight: 100,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.lightBlue,
-  },
-  optionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  optionIcon: {
-    marginRight: 16,
-    padding: 12,
-    backgroundColor: colors.lightBlue,
-    borderRadius: 12,
-  },
-  optionTextContainer: {
-    flex: 1,
-  },
-  optionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  optionDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-});
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { colors } from "@/styles/commonStyles";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 
 export default function ProfileScreen() {
-  const theme = useTheme();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [verificationStep, setVerificationStep] = useState(1);
 
-  const renderProfileOption = (option: typeof profileOptions[0], index: number) => {
-    return (
-      <Animated.View
-        key={option.id}
-        entering={FadeInDown.delay(index * 100).springify()}
-      >
-        <Pressable
-          style={styles.optionCard}
-          onPress={() => console.log(`Option pressed: ${option.title}`)}
-          android_ripple={{ color: colors.lightBlue }}
-        >
-          <View style={[styles.optionContent, { borderLeftColor: option.color }]}>
-            <View style={styles.optionHeader}>
-              <View style={[styles.optionIcon, { backgroundColor: `${option.color}20` }]}>
-                <IconSymbol
-                  name={option.icon}
-                  size={28}
-                  color={option.color}
-                />
-              </View>
-              <View style={styles.optionTextContainer}>
-                <Text style={styles.optionTitle}>{option.title}</Text>
-                <Text style={styles.optionDescription}>{option.description}</Text>
-              </View>
-            </View>
-          </View>
-        </Pressable>
-      </Animated.View>
-    );
+  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [sentCode, setSentCode] = useState(null);
+
+  // Helper function
+  const generateCode = () =>
+    Math.floor(100000 + Math.random() * 900000).toString();
+
+  const calculateAge = (day, month, year) => {
+    const today = new Date();
+    let age = today.getFullYear() - year;
+    const m = today.getMonth() + 1 - month;
+    if (m < 0 || (m === 0 && today.getDate() < day)) age--;
+    return age;
   };
 
+  // =====================
+  // SIGN UP
+  // =====================
+  const handleSignUp = () => {
+    setErrorMessage("");
+
+    if (!emailOrPhone || !password || !fullName || !birthDate) {
+      setErrorMessage("Please fill all fields to sign up.");
+      return;
+    }
+
+    // Validate date
+    const regex =
+      /^([0-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
+    if (!regex.test(birthDate)) {
+      setErrorMessage("Please enter a valid birth date (DD/MM/YYYY).");
+      return;
+    }
+
+    const [day, month, year] = birthDate.split("/").map(Number);
+    const date = new Date(year, month - 1, day);
+    if (date.getDate() !== day || date.getMonth() + 1 !== month) {
+      setErrorMessage("Please enter a valid calendar date.");
+      return;
+    }
+
+    const age = calculateAge(day, month, year);
+    if (age < 16) {
+      setErrorMessage("You must be at least 16 years old to register.");
+      return;
+    }
+
+    // Validate email or phone
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
+    const isEmail = emailRegex.test(emailOrPhone);
+    const isPhone = phoneRegex.test(emailOrPhone);
+    if (!isEmail && !isPhone) {
+      setErrorMessage("Please enter a valid email or phone number.");
+      return;
+    }
+
+    // Validate password
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setErrorMessage(
+        "Password must have at least 8 characters, one uppercase letter, and one special character."
+      );
+      return;
+    }
+
+    // Prevent duplicate
+    const exists = registeredUsers.some(
+      (u) => u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
+    );
+    if (exists) {
+      Alert.alert("Account exists", "This email or phone number is already registered.");
+      return;
+    }
+
+    const newUser = { emailOrPhone, password, fullName, birthDate };
+    setRegisteredUsers([...registeredUsers, newUser]);
+    setCurrentUser(newUser);
+    setIsAuthenticated(true);
+    Alert.alert("🎉 Account created!", "Welcome to IntoKosova!");
+  };
+
+  // =====================
+  // SIGN IN
+  // =====================
+  const handleSignIn = () => {
+    const foundUser = registeredUsers.find(
+      (u) =>
+        u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase() &&
+        u.password === password
+    );
+
+    if (foundUser) {
+      setIsAuthenticated(true);
+      setCurrentUser(foundUser);
+      setErrorMessage("");
+      setAttempts(0);
+    } else {
+      const newAttempts = attempts + 1;
+      setAttempts(newAttempts);
+      if (newAttempts >= 5) {
+        Alert.alert(
+          "Too many attempts",
+          "You’ve reached the maximum of 5 login attempts. Try again later."
+        );
+        return;
+      }
+      setErrorMessage("Incorrect credentials. Please try again.");
+    }
+  };
+
+  // =====================
+  // FORGOT PASSWORD FLOW
+  // =====================
+  const handleSendVerification = () => {
+    const foundUser = registeredUsers.find(
+      (u) => u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
+    );
+    if (!foundUser) {
+      setErrorMessage("No account found with this email or phone.");
+      return;
+    }
+
+    const code = generateCode();
+    setSentCode(code);
+    setVerificationStep(2);
+    Alert.alert("📩 Verification Code Sent", `A 6-digit code has been sent (simulated).`);
+    setErrorMessage("");
+  };
+
+  const handleVerifyCode = () => {
+    if (verificationCode === sentCode) {
+      setVerificationStep(3);
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Invalid verification code.");
+    }
+  };
+
+  const handleChangePassword = () => {
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      setErrorMessage(
+        "Password must have at least 8 characters, one uppercase letter, and one special character."
+      );
+      return;
+    }
+
+    const updatedUsers = registeredUsers.map((u) =>
+      u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
+        ? { ...u, password: newPassword }
+        : u
+    );
+    setRegisteredUsers(updatedUsers);
+
+    Alert.alert("✅ Password Updated", "You can now log in with your new password.");
+    setForgotPassword(false);
+    setVerificationStep(1);
+    setNewPassword("");
+    setVerificationCode("");
+    setSentCode(null);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    setEmailOrPhone("");
+    setPassword("");
+  };
+
+  // =====================
+  // AUTH SCREENS
+  // =====================
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView style={styles.authContainer}>
+        <Animated.View entering={FadeInUp.springify()}>
+          <Text style={styles.authTitle}>
+            {forgotPassword
+              ? "Reset Password"
+              : isSignUp
+              ? "Create your account"
+              : "Welcome back"}
+          </Text>
+
+          {forgotPassword ? (
+            <>
+              {verificationStep === 1 && (
+                <>
+                  <TextInput
+                    placeholder="Email or phone number"
+                    style={styles.input}
+                    value={emailOrPhone}
+                    onChangeText={setEmailOrPhone}
+                  />
+                  {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+                  <Pressable
+                    style={[styles.button, { backgroundColor: colors.primary }]}
+                    onPress={handleSendVerification}
+                  >
+                    <Text style={styles.buttonText}>Send Verification Code</Text>
+                  </Pressable>
+                </>
+              )}
+
+              {verificationStep === 2 && (
+                <>
+                  <TextInput
+                    placeholder="Enter verification code"
+                    style={styles.input}
+                    value={verificationCode}
+                    onChangeText={setVerificationCode}
+                    keyboardType="numeric"
+                  />
+                  {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+                  <Pressable
+                    style={[styles.button, { backgroundColor: colors.primary }]}
+                    onPress={handleVerifyCode}
+                  >
+                    <Text style={styles.buttonText}>Verify Code</Text>
+                  </Pressable>
+                </>
+              )}
+
+              {verificationStep === 3 && (
+                <>
+                  <TextInput
+                    placeholder="Enter new password"
+                    style={styles.input}
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                    secureTextEntry
+                  />
+                  {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+                  <Pressable
+                    style={[styles.button, { backgroundColor: colors.primary }]}
+                    onPress={handleChangePassword}
+                  >
+                    <Text style={styles.buttonText}>Change Password</Text>
+                  </Pressable>
+                </>
+              )}
+
+              <Pressable
+                onPress={() => {
+                  setForgotPassword(false);
+                  setVerificationStep(1);
+                }}
+              >
+                <Text style={styles.linkText}>Back to Sign In</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              {isSignUp && (
+                <>
+                  <TextInput
+                    placeholder="Full name"
+                    style={styles.input}
+                    value={fullName}
+                    onChangeText={setFullName}
+                  />
+
+                  {/* ✅ Date input with validation */}
+                  <View style={{ width: "100%" }}>
+                    <TextInput
+                      placeholder="DD/MM/YYYY"
+                      style={[
+                        styles.input,
+                        {
+                          borderColor:
+                            errorMessage.includes("birth date") ||
+                            errorMessage.includes("16 years") ||
+                            errorMessage.includes("calendar")
+                              ? "#e63946"
+                              : "#ddd",
+                        },
+                      ]}
+                      value={birthDate}
+                      onChangeText={(text) => {
+                        let formatted = text.replace(/[^\d/]/g, "");
+                        if (formatted.length === 2 && !formatted.includes("/")) {
+                          formatted = formatted + "/";
+                        } else if (
+                          formatted.length === 5 &&
+                          formatted.lastIndexOf("/") === 2
+                        ) {
+                          formatted = formatted + "/";
+                        }
+                        if (formatted.length > 10) return;
+                        setBirthDate(formatted);
+
+                        const regex =
+                          /^([0-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
+                        if (!regex.test(formatted)) return;
+
+                        const [day, month, year] = formatted.split("/").map(Number);
+                        const date = new Date(year, month - 1, day);
+                        if (date.getDate() !== day || date.getMonth() + 1 !== month) {
+                          setErrorMessage("Please enter a valid calendar date.");
+                          return;
+                        }
+
+                        const age = calculateAge(day, month, year);
+                        if (age < 16) {
+                          setErrorMessage("You must be at least 16 years old to register.");
+                        } else {
+                          setErrorMessage("");
+                        }
+                      }}
+                      keyboardType="numeric"
+                      maxLength={10}
+                    />
+                    {errorMessage &&
+                    (errorMessage.includes("birth date") ||
+                      errorMessage.includes("16 years") ||
+                      errorMessage.includes("calendar")) ? (
+                      <Text style={styles.errorText}>{errorMessage}</Text>
+                    ) : null}
+                  </View>
+                </>
+              )}
+
+              <TextInput
+                placeholder="Email or phone number"
+                style={styles.input}
+                value={emailOrPhone}
+                onChangeText={setEmailOrPhone}
+              />
+
+              <TextInput
+                placeholder="Password"
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+
+              {errorMessage &&
+              !errorMessage.includes("birth date") &&
+              !errorMessage.includes("calendar") &&
+              !errorMessage.includes("16 years") ? (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              ) : null}
+
+              <Pressable
+                style={[styles.button, { backgroundColor: colors.primary }]}
+                onPress={isSignUp ? handleSignUp : handleSignIn}
+              >
+                <Text style={styles.buttonText}>
+                  {isSignUp ? "Sign Up" : "Sign In"}
+                </Text>
+              </Pressable>
+
+              {!isSignUp && (
+                <Pressable onPress={() => setForgotPassword(true)}>
+                  <Text style={[styles.linkText, { marginTop: 8 }]}>
+                    Forgot Password?
+                  </Text>
+                </Pressable>
+              )}
+
+              <Pressable onPress={() => setIsSignUp(!isSignUp)}>
+                <Text style={styles.linkText}>
+                  {isSignUp
+                    ? "Already have an account? Sign In"
+                    : "Don't have an account? Sign Up"}
+                </Text>
+              </Pressable>
+            </>
+          )}
+        </Animated.View>
+      </SafeAreaView>
+    );
+  }
+
+  // =====================
+  // PROFILE
+  // =====================
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
         <View style={styles.profileImage}>
-          <IconSymbol
-            name="person.fill"
-            size={40}
-            color="#FFFFFF"
-          />
+          <IconSymbol name="person.fill" size={40} color="#fff" />
         </View>
-        <Text style={styles.profileName}>Kosovo Explorer</Text>
-        <Text style={styles.profileEmail}>explorer@intokosova.com</Text>
-        <View style={styles.profileStats}>
+        <Text style={styles.profileName}>{currentUser?.fullName}</Text>
+        <Text style={styles.profileEmail}>{currentUser?.emailOrPhone}</Text>
+      </Animated.View>
+
+      <ScrollView style={{ paddingHorizontal: 20 }}>
+        <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>12</Text>
             <Text style={styles.statLabel}>Places Visited</Text>
@@ -259,37 +434,93 @@ export default function ProfileScreen() {
             <Text style={styles.statLabel}>Photos</Text>
           </View>
         </View>
-      </Animated.View>
 
-      <ScrollView 
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
-        <Animated.View 
-          entering={FadeInUp.delay(200).springify()}
-          style={styles.statsContainer}
-        >
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>12</Text>
-            <Text style={styles.statLabel}>Places{'\n'}Visited</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>8</Text>
-            <Text style={styles.statLabel}>Saved{'\n'}Favorites</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>24</Text>
-            <Text style={styles.statLabel}>Photos{'\n'}Taken</Text>
-          </View>
-        </Animated.View>
-
-        <View style={styles.optionsContainer}>
-          {profileOptions.map((option, index) => 
-            renderProfileOption(option, index)
-          )}
-        </View>
+        <Pressable style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.buttonText}>Log Out</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  authContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+    backgroundColor: "#f9fafb",
+  },
+  authTitle: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 24,
+    color: colors.primary,
+    textAlign: "center",
+  },
+  input: {
+    width: "100%",
+    backgroundColor: "#fff",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 14,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    fontSize: 16,
+  },
+  button: {
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  linkText: {
+    color: colors.primary,
+    marginTop: 16,
+    textAlign: "center",
+    fontWeight: "500",
+    fontSize: 15,
+  },
+  errorText: {
+    color: "#e63946",
+    marginBottom: 10,
+    textAlign: "center",
+    fontSize: 14,
+  },
+  header: { alignItems: "center", marginTop: 40 },
+  profileImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  profileName: { fontSize: 24, fontWeight: "700", color: colors.text },
+  profileEmail: { fontSize: 15, color: colors.textSecondary, marginBottom: 20 },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 24,
+    paddingVertical: 16,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+  },
+  statItem: { alignItems: "center" },
+  statNumber: { fontSize: 18, fontWeight: "bold", color: colors.primary },
+  statLabel: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  logoutButton: {
+    backgroundColor: "#FF6B6B",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 50,
+  },
+});
+
