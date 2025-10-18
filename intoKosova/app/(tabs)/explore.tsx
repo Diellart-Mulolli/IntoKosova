@@ -13,6 +13,7 @@ import { colors, commonStyles } from "@/styles/commonStyles";
 import { GlassView } from "expo-glass-effect";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { useRouter } from "expo-router"; // ✅ për navigim
 
 const explorationCategories = [
   {
@@ -21,7 +22,17 @@ const explorationCategories = [
     description: "Discover Kosovo's rich historical heritage",
     icon: "building.columns.fill",
     color: colors.primary,
-    items: ["Graçanica Monastery", "Deçan Monastery", "Patriarchate of Peja"],
+    items: [
+      {
+        name: "Graçanica Monastery",
+        image: require("@/assets/images/gracanica.jpg"),
+      },
+      { name: "Deçan Monastery", image: require("@/assets/images/decan.jpg") },
+      {
+        name: "Patriarchate of Peja",
+        image: require("@/assets/images/peja.jpg"),
+      },
+    ],
   },
   {
     id: 2,
@@ -29,7 +40,14 @@ const explorationCategories = [
     description: "Explore breathtaking landscapes and nature",
     icon: "mountain.2.fill",
     color: colors.accent,
-    items: ["Rugova Canyon", "Mirusha Waterfalls", "Sharr Mountains"],
+    items: [
+      { name: "Rugova Canyon", image: require("@/assets/images/rugova.jpg") },
+      {
+        name: "Mirusha Waterfalls",
+        image: require("@/assets/images/mirusha.jpg"),
+      },
+      { name: "Sharr Mountains", image: require("@/assets/images/sharr.jpg") },
+    ],
   },
   {
     id: 3,
@@ -37,7 +55,17 @@ const explorationCategories = [
     description: "Experience traditional Kosovo culture",
     icon: "theatermasks.fill",
     color: colors.secondary,
-    items: ["Traditional Crafts", "Folk Music", "Local Festivals"],
+    items: [
+      {
+        name: "Traditional Crafts",
+        image: require("@/assets/images/crafts.jpg"),
+      },
+      { name: "Folk Music", image: require("@/assets/images/music.jpg") },
+      {
+        name: "Local Festivals",
+        image: require("@/assets/images/festival.jpg"),
+      },
+    ],
   },
   {
     id: 4,
@@ -45,7 +73,17 @@ const explorationCategories = [
     description: "Contemporary life and urban experiences",
     icon: "building.2.fill",
     color: colors.highlight,
-    items: ["Pristina City Center", "Modern Architecture", "Nightlife"],
+    items: [
+      {
+        name: "Pristina City Center",
+        image: require("@/assets/images/city.jpg"),
+      },
+      {
+        name: "Modern Architecture",
+        image: require("@/assets/images/architecture.jpg"),
+      },
+      { name: "Nightlife", image: require("@/assets/images/nightlife.jpg") },
+    ],
   },
   {
     id: 5,
@@ -53,7 +91,14 @@ const explorationCategories = [
     description: "Taste authentic Kosovo cuisine",
     icon: "fork.knife",
     color: "#FF6B6B",
-    items: ["Flija", "Burek", "Traditional Restaurants"],
+    items: [
+      { name: "Flija", image: require("@/assets/images/flija.jpg") },
+      { name: "Burek", image: require("@/assets/images/burek.jpg") },
+      {
+        name: "Traditional Restaurants",
+        image: require("@/assets/images/restaurant.jpg"),
+      },
+    ],
   },
   {
     id: 6,
@@ -61,7 +106,20 @@ const explorationCategories = [
     description: "Outdoor activities and adventures",
     icon: "figure.hiking",
     color: "#4ECDC4",
-    items: ["Hiking Trails", "Rock Climbing", "Winter Sports"],
+    items: [
+      {
+        name: "Hiking Trails",
+        image: require("@/assets/images/hiking.jpg"),
+      },
+      {
+        name: "Rock Climbing",
+        image: require("@/assets/images/climbing.jpg"),
+      },
+      {
+        name: "Winter Sports",
+        image: require("@/assets/images/winter_sports.jpg"),
+      },
+    ],
   },
 ];
 
@@ -74,26 +132,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
-    alignItems: "center", // Center the header content
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: "bold",
     color: colors.text,
     marginBottom: 8,
-    textAlign: "center", // Center the title text
+    textAlign: "center",
   },
   headerSubtitle: {
     fontSize: 16,
     color: colors.textSecondary,
     lineHeight: 22,
-    textAlign: "center", // Center the subtitle text
+    textAlign: "center",
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
-  // Add color strip like home page
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -199,6 +256,7 @@ const styles = StyleSheet.create({
 
 export default function ExplorationScreen() {
   const theme = useTheme();
+  const router = useRouter(); // ✅ përdorim për klikim
 
   const renderCategoryCard = (
     category: (typeof explorationCategories)[0],
@@ -211,7 +269,12 @@ export default function ExplorationScreen() {
       >
         <Pressable
           style={styles.categoryCard}
-          onPress={() => console.log(`Exploring ${category.title}`)}
+          onPress={() =>
+            router.push({
+              pathname: "/categoryDetails",
+              params: { id: category.id },
+            })
+          }
           android_ripple={{ color: colors.lightBlue }}
         >
           <View
@@ -241,7 +304,7 @@ export default function ExplorationScreen() {
                 <View style={styles.categoryItems}>
                   {category.items.slice(0, 2).map((item, idx) => (
                     <Text key={idx} style={styles.categoryItem}>
-                      • {item}
+                      • {item.name || item}
                     </Text>
                   ))}
                   {category.items.length > 2 && (
