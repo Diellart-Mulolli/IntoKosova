@@ -122,6 +122,84 @@ const styles = StyleSheet.create({
     color: "#4A5568",
     textAlign: "center",
   },
+  categoriesContainer: {
+    paddingBottom: 100, // Space for floating tab bar
+  },
+  categoryCard: {
+    width: '100%', // Full width like home page
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+      web: {
+        boxShadow: '0 6px 20px rgba(49, 130, 206, 0.15)',
+      },
+    }),
+  },
+  categoryContent: {
+    padding: 20,
+    backgroundColor: colors.card,
+    minHeight: 120,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.lightBlue,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  categoryIcon: {
+    marginRight: 16,
+    padding: 12,
+    backgroundColor: colors.lightBlue,
+    borderRadius: 12,
+  },
+  categoryTextContainer: {
+    flex: 1,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  categoryDescription: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  categoryItems: {
+    marginTop: 8,
+  },
+  categoryItem: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 2,
+    opacity: 0.8,
+  },
+});
+
+export default function ExplorationScreen() {
+  const theme = useTheme();
+
+  const renderCategoryCard = (category: typeof explorationCategories[0], index: number) => {
+    return (
+      <Animated.View
+        key={category.id}
+        entering={FadeInDown.delay(index * 100).springify()}
+      >
+
+
   categoryCard: {
     marginBottom: 16,
     borderRadius: 12,
