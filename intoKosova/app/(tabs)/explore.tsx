@@ -242,9 +242,11 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 20,
     marginBottom: 8,
+    marginLeft: 5,
   },
   categoryItems: {
     marginTop: 8,
+    marginLeft: 8,
   },
   categoryItem: {
     fontSize: 12,
@@ -292,7 +294,7 @@ export default function ExplorationScreen() {
               >
                 <IconSymbol
                   name={category.icon}
-                  size={28}
+                  size={40}
                   color={category.color}
                 />
               </View>

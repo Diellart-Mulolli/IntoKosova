@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   },
   featureIcon: {
     marginRight: 16,
+    marginTop:10,
     padding: 12,
     backgroundColor: colors.lightBlue,
     borderRadius: 12,
