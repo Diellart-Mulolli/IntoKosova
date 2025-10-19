@@ -41,7 +41,7 @@ const features = [
 
 const stats = [
   { label: "UNESCO Sites", value: "4", icon: "star.fill" },
-  { label: "National Parks", value: "2", icon: "leaf.fill" },
+  { label: "National Parks", value: "2", icon: "mountain.2.fill" },
   { label: "Museums", value: "15+", icon: "building.fill" },
 ];
 

@@ -13,7 +13,7 @@ import { colors, commonStyles } from "@/styles/commonStyles";
 import { GlassView } from "expo-glass-effect";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router"; // ✅ për navigim
 
 export const explorationCategories = [
   {

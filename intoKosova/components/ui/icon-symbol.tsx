@@ -16,7 +16,17 @@ const MAPPING = {
   'info.circle': 'info',
   'magnifyingglass': 'search',
   'list.bullet': 'list',
-} as IconMapping;
+  'building.columns.fill': 'business', 
+  'theatermasks.fill': 'groups',
+  'building.2.fill': 'apartment', 
+  'star.fill': 'star', 
+  'mountain.2.fill': 'terrain',
+  'building.fill': 'storefront', 
+  'bell.fill': 'notifications', 
+  'line.horizontal.3': 'menu', 
+  'fork.knife': 'restaurant', 
+  'figure.hiking': 'hiking',
+} as const;
 
 
 export function IconSymbol({
