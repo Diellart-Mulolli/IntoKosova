@@ -54,7 +54,7 @@ npx expo start
 Scan the QR code in the terminal or browser using the Expo Go app on your phone to view the app.
 ```
 
-#### Technologies Used
+## Technologies Used
 Area	Technology
 Framework	React Native / Expo
 Navigation	Expo Router
@@ -67,7 +67,7 @@ This project aims to create an educational and tourism-focused mobile app that h
 It serves as a digital guide for locals, tourists, and anyone interested in learning more about Kosovo.
 The project also emphasizes teamwork, user-centered design, and innovation in mobile development.
 
-##### Team — intoKosova
+## Team — intoKosova
 
 Amat Raçi
 
