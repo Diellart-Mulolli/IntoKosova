@@ -1,5 +1,5 @@
-import { Tabs, router } from 'expo-router';
-import React from 'react';
+import { Tabs, router, useNavigation } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
@@ -26,21 +26,38 @@ const styles = StyleSheet.create({
   plusButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 25,
-    backgroundColor: Colors.light.tint, // Adjust based on theme
-    top: -10, // Elevate the button slightly
+    borderWidth: 2,
+    borderColor: 'black',
+    backgroundColor: 'white', // Default background
+    top: 8, // Elevate the button slightly
+  },
+  plusButtonActive: {
+    backgroundColor: Colors.light.activeTint, // Light blue for active state
   },
 });
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const navigation = useNavigation();
+  const [isCreateActive, setIsCreateActive] = useState(false);
+
+  // Detect when the create screen is focused
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('state', (e) => {
+      const currentRoute = e.data.state.routes[e.data.state.index];
+      setIsCreateActive(currentRoute.name === 'create');
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].activeTint, // Light blue for active tab
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].inactiveTint, // Optional: define for inactive tabs
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
@@ -75,17 +92,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="create"
         options={{
-          // No href, just a custom button
           tabBarButton: (props) => (
             <Pressable
-              onPress={() => router.push('/create')}
-              style={styles.plusButton}
+              onPress={() => router.push('/(tabs)/create')}
+              style={[
+                styles.plusButton,
+                isCreateActive && styles.plusButtonActive,
+              ]}
             >
-              <IconSymbol size={28} name="plus" color={Colors[colorScheme ?? 'light'].background} />
+              <IconSymbol
+                size={28}
+                name="plus"
+                color={isCreateActive ? Colors[colorScheme ?? 'light'].activeTint : Colors[colorScheme ?? 'light'].background}
+              />
             </Pressable>
           ),
-          // Prevent this from being a navigable screen
-          tabBarLabel: () => null,
+          tabBarLabel: () => null, // Prevent label in tab bar
         }}
       />
       <Tabs.Screen

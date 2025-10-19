@@ -12,7 +12,7 @@ export default function CreateScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Create</ThemedText>
-      <Link href="/" dismissTo style={styles.link}>
+      <Link href="/(tabs)/homepage" style={styles.link}>
         <ThemedText type="link">Go to home screen</ThemedText>
       </Link>
       <IconSymbol
@@ -41,8 +41,3 @@ const styles = StyleSheet.create({
     bottom: 20,
   },
 });
-
-export const options = {
-  presentation: 'modal',
-  headerShown: false,
-};

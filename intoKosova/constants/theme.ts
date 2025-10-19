@@ -1,12 +1,16 @@
 export const Colors = {
   light: {
-    background: '#ffffff',
-    text: '#000000',
-    tint: '#2f95dc',
+    text: '#000',
+    background: '#fff',
+    tint: '#2f95dc', // Default tint
+    activeTint: '#2f95dc', // Light blue for active tab
+    inactiveTint: '#666', // Optional: for inactive tabs
   },
   dark: {
-    background: '#000000',
-    text: '#ffffff',
-    tint: '#ffffff',
+    text: '#fff',
+    background: '#000',
+    tint: '#2f95dc', // Default tint
+    activeTint: '#4da8ff', // Slightly lighter blue for dark mode
+    inactiveTint: '#999', // Optional: for inactive tabs
   },
 };
