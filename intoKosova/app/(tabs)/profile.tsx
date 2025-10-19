@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   input: {
-    width: "100%",
+    width: 300,
     backgroundColor: "#fff",
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    width: "100%",
+    width: 300,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
@@ -523,4 +523,3 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
 });
-

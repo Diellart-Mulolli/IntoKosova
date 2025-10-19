@@ -15,6 +15,7 @@ const MAPPING = {
   'person.fill': 'person',
   'info.circle': 'info',
   'magnifyingglass': 'search',
+  'list.bullet': 'list',
 } as IconMapping;
 
 
