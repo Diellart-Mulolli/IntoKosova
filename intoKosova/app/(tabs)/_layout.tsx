@@ -24,15 +24,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   plusButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
-    height: 40,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: 'black',
-    backgroundColor: 'white', // Default background
-    top: 8, // Elevate the button slightly
+    fontSize: 50,
+    marginBottom: 5,
   },
   plusButtonActive: {
     backgroundColor: Colors.light.activeTint, // Light blue for active state
@@ -57,7 +50,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].activeTint, // Light blue for active tab
-        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].inactiveTint, // Optional: define for inactive tabs
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].inactiveTint, // Inactive tabs
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
@@ -88,26 +81,11 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
-      {/* Plus icon button */}
-      <Tabs.Screen
+     <Tabs.Screen
         name="create"
         options={{
-          tabBarButton: (props) => (
-            <Pressable
-              onPress={() => router.push('/(tabs)/create')}
-              style={[
-                styles.plusButton,
-                isCreateActive && styles.plusButtonActive,
-              ]}
-            >
-              <IconSymbol
-                size={28}
-                name="plus"
-                color={isCreateActive ? Colors[colorScheme ?? 'light'].activeTint : Colors[colorScheme ?? 'light'].background}
-              />
-            </Pressable>
-          ),
-          tabBarLabel: () => null, // Prevent label in tab bar
+          title: '',
+          tabBarIcon: ({ color }) => <IconSymbol style = { styles.plusButton } size={28} name="circled.plus" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -115,6 +93,13 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
         }}
       />
     </Tabs>
