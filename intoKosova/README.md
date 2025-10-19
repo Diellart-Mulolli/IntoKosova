@@ -1,50 +1,88 @@
-# Welcome to your Expo app 👋
+intoKosova
+Abstract Idea
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+intoKosova is a mobile application built with React Native (Expo) that showcases the cultural heritage, natural beauty, and modern lifestyle of Kosovo.
+The app provides a simple, elegant, and interactive way to explore the most remarkable destinations across the country.
 
-## Get started
+The goal of intoKosova is to promote Kosovo as a travel destination through a modern and immersive digital experience.
 
-1. Install dependencies
+Users can:
 
-   ```bash
-   npm install
-   ```
+Discover historical and cultural landmarks
 
-2. Start the app
+Explore natural parks and scenic landscapes
 
-   ```bash
-   npx expo start
-   ```
+Experience local traditions and modern life
 
-In the output, you'll find options to open the app in a
+Architecture Overview
+Frontend (Mobile App)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Built with React Native and Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Navigation handled with Expo Router for structured and scalable routing
 
-## Get a fresh project
+React Native Reanimated for smooth animations and user interactions
 
-When you're ready, run:
+Expo Glass Effect and SafeAreaView for accessibility and modern UI
 
-```bash
-npm run reset-project
-```
+Custom-built components and icons for a personalized interface
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Data & Content
 
-## Learn more
+Dynamic data for categories such as Historical Sites, Natural Wonders, and Modern Attractions
 
-To learn more about developing your project with Expo, look at the following resources:
+Interactive UI elements to browse destinations, descriptions, and visuals
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Setup and Use
 
-## Join the community
+To run this project on your local machine, ensure you have installed:
 
-Join our community of developers creating universal apps.
+Node.js (with npm or yarn)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Expo CLI globally
+
+Installation
+
+Clone the repository:
+
+git clone https://github.com/<your-username>/intoKosova.git
+cd intoKosova
+
+
+Install dependencies:
+
+npm install
+
+
+Run the development server:
+
+npx expo start
+
+
+Scan the QR code in the terminal or browser using the Expo Go app on your phone to view the app.
+
+Technologies Used
+Area	Technology
+Framework	React Native / Expo
+Navigation	Expo Router
+Animations	React Native Reanimated
+UI Design	Expo Glass Effect, SafeAreaView
+Components	Custom-built reusable UI elements
+Purpose
+
+This project aims to create an educational and tourism-focused mobile app that highlights Kosovo’s identity, beauty, and diversity using modern technology and clean design.
+It serves as a digital guide for locals, tourists, and anyone interested in learning more about Kosovo.
+
+Team — intoKosova
+
+Amat Raçi
+
+Anis Millaku
+
+Diella Kika
+
+Diellart Mulolli
+
+Erisa Ramadani
+
+Shpetim Panduri
