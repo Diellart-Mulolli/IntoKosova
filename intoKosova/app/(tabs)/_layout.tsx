@@ -1,11 +1,11 @@
-import { Tabs } from 'expo-router';
+import { Tabs, router } from 'expo-router';
 import React from 'react';
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { GlassView } from 'expo-glass-effect';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 
 const TAB_BAR_HEIGHT = 64;
 
@@ -22,6 +22,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     overflow: 'hidden',
+  },
+  plusButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: Colors.light.tint, // Adjust based on theme
+    top: -10, // Elevate the button slightly
   },
 });
 
@@ -40,12 +49,9 @@ export default function TabLayout() {
           backgroundColor: 'transparent',
           borderTopWidth: 0,
           elevation: 0,
-          paddingHorizontal: 0,
-          flexDirection: 'row',
-          justifyContent: 'space-around',
         },
         tabBarBackground: () => (
-          <View style={[styles.tabBackground, { pointerEvents: 'none' }]}>
+          <View style={styles.tabBackground} pointerEvents="none">
             <GlassView tintColor={Colors[colorScheme ?? 'light'].background} style={styles.glassContainer} />
           </View>
         ),
@@ -62,7 +68,24 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+        }}
+      />
+      {/* Plus icon button */}
+      <Tabs.Screen
+        name="create"
+        options={{
+          // No href, just a custom button
+          tabBarButton: (props) => (
+            <Pressable
+              onPress={() => router.push('/create')}
+              style={styles.plusButton}
+            >
+              <IconSymbol size={28} name="plus" color={Colors[colorScheme ?? 'light'].background} />
+            </Pressable>
+          ),
+          // Prevent this from being a navigable screen
+          tabBarLabel: () => null,
         }}
       />
       <Tabs.Screen
@@ -72,13 +95,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />
-    <Tabs.Screen
-        name="categoryDetails"
-        options={{
-          title: 'CategoryDetails',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />, 
-        }}
-      />
-     </Tabs>
+    </Tabs>
   );
 }

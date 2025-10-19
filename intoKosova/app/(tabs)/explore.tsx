@@ -13,9 +13,9 @@ import { colors, commonStyles } from "@/styles/commonStyles";
 import { GlassView } from "expo-glass-effect";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-import { useRouter } from "expo-router"; // ✅ për navigim
+import { useRouter } from "expo-router";
 
-const explorationCategories = [
+export const explorationCategories = [
   {
     id: 1,
     title: "Historical Sites",
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
 
 export default function ExplorationScreen() {
   const theme = useTheme();
-  const router = useRouter(); // ✅ përdorim për klikim
+  const router = useRouter();
 
   const renderCategoryCard = (
     category: (typeof explorationCategories)[0],
@@ -271,8 +271,8 @@ export default function ExplorationScreen() {
           style={styles.categoryCard}
           onPress={() =>
             router.push({
-              pathname: "/categoryDetails",
-              params: { id: category.id },
+              pathname: "/(modals)/categoryDetails",
+              params: { id: category.id.toString() }, // Convert id to string for navigation
             })
           }
           android_ripple={{ color: colors.lightBlue }}
