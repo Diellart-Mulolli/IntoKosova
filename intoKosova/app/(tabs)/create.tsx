@@ -4,34 +4,58 @@ import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function CreateScreen() {
   const colorScheme = useColorScheme();
 
+  console.log('CreateScreen: Starting animations');
+
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.photoPlaceholder}>
-        <ThemedText type="default" style={styles.placeholderText}>
-          Photo Preview
-        </ThemedText>
+      <Animated.View
+        entering={FadeInUp.springify()}
+        style={styles.photoPlaceholder}
+      >
+        <Animated.View
+          entering={FadeInDown.delay(100).springify()}
+          style={[styles.textButton, { marginTop: '40%' }]}
+        >
+          <Pressable>
+            <IconSymbol
+              size={24}
+              name="text"
+              color={Colors[colorScheme ?? 'light'].tint}
+            />
+          </Pressable>
+        </Animated.View>
 
-        <Pressable style={[styles.textButton, { marginTop: '40%' }]}>
-          
-          <IconSymbol
-            size={24}
-            name="text"
-            color={Colors[colorScheme ?? 'light'].text}
-          />
-        </Pressable>
+        <Animated.View
+          entering={FadeInDown.delay(200).springify()}
+          style={[styles.cameraButton, { marginTop: 10 }]}
+        >
+          <Pressable>
+            <IconSymbol
+              size={36}
+              name="camera"
+              color={Colors[colorScheme ?? 'light'].tint}
+            />
+          </Pressable>
+        </Animated.View>
 
-        <Pressable style={[styles.cameraButton, { marginTop: 10 }]}>
-          <IconSymbol
-            size={24}
-            name="camera"
-            color={Colors[colorScheme ?? 'light'].text}
-          />
-        </Pressable>
-      </View>
+        <Animated.View
+          entering={FadeInDown.delay(300).springify()}
+          style={[styles.cameraButton, { marginTop: 10 }]}
+        >
+          <Pressable onPress={() => console.log('Plus button pressed')}>
+            <IconSymbol
+              size={48}
+              name="plus"
+              color={Colors[colorScheme ?? 'light'].tint}
+            />
+          </Pressable>
+        </Animated.View>
+      </Animated.View>
     </ThemedView>
   );
 }
@@ -46,31 +70,30 @@ const styles = StyleSheet.create({
   photoPlaceholder: {
     width: '100%',
     height: '90%',
-    backgroundColor: '#fff', // White background
+    backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: Colors.light.tint, // Blue outline
+    borderColor: Colors.light.tint,
     borderRadius: 8,
     marginVertical: 20,
     marginTop: 0,
     marginBottom: 40,
-    position: 'relative', // Allow absolute positioning of buttons
+    position: 'relative',
+    alignItems: 'center',
   },
   placeholderText: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
     fontSize: 24,
     fontWeight: '500',
     marginTop: 10,
     color: Colors.light.text,
+    textAlign: 'center',
   },
   textButton: {
     width: 60,
     height: 60,
-    borderRadius: 30, // Circular shape
-    backgroundColor: '#fff', // White background
+    borderRadius: 30,
+    backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: Colors.light.tint, // Blue outline
+    borderColor: Colors.light.tint,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 'auto',
@@ -79,10 +102,10 @@ const styles = StyleSheet.create({
   cameraButton: {
     width: 60,
     height: 60,
-    borderRadius: 30, // Circular shape
-    backgroundColor: '#fff', // White background
+    borderRadius: 30,
+    backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: Colors.light.tint, // Blue outline
+    borderColor: Colors.light.tint,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 'auto',

@@ -28,7 +28,11 @@ const MAPPING = {
   'bell.fill': 'notifications',
   'line.horizontal.3': 'menu',
   'fork.knife': 'restaurant',
-  'figure.hiking': 'walk', // Updated from 'hiking'
+  'figure.hiking': 'walk',
+  'accessibility': 'accessibility',
+  'xmark': 'close',
+  'paintpalette.fill': 'color-palette',
+  'plus': 'add',
 } as const;
 
 export function IconSymbol({
