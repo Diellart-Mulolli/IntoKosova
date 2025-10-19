@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   button: {
     marginLeft: 8,
     backgroundColor: '#fff', // White background
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: Colors.light.tint, // Blue outline
     borderRadius: 8,
     paddingVertical: 8,

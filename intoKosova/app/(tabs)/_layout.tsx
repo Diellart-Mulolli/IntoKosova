@@ -24,8 +24,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   plusButton: {
-    fontSize: 50,
-    marginBottom: 5,
+    fontSize: 60,
   },
   plusButtonActive: {
     backgroundColor: Colors.light.activeTint, // Light blue for active state

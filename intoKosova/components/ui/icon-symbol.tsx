@@ -15,8 +15,21 @@ const MAPPING = {
   'info.circle': 'information-circle',
   'magnifyingglass': 'search',
   'list.bullet': 'list',
-} as IconMapping;
-
+  'gearshape.fill': 'settings',
+  'circled.plus': 'add-circle',
+  'camera': 'camera',
+  'text': 'text',
+  'building.columns.fill': 'business',
+  'theatermasks.fill': 'people',
+  'building.2.fill': 'business',
+  'star.fill': 'star',
+  'mountain.2.fill': 'earth',
+  'building.fill': 'storefront',
+  'bell.fill': 'notifications',
+  'line.horizontal.3': 'menu',
+  'fork.knife': 'restaurant',
+  'figure.hiking': 'walk', // Updated from 'hiking'
+} as const;
 
 export function IconSymbol({
   name,
@@ -30,5 +43,10 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  return <Ionicons color={color} size={size} name={MAPPING[name]} style={style} />;
+  const iconName = MAPPING[name];
+  if (!iconName) {
+    console.warn(`IconSymbol: Invalid icon name "${name}"`);
+    return null; // Fallback to avoid rendering invalid icons
+  }
+  return <Ionicons color={color} size={size} name={iconName} style={style} />;
 }
