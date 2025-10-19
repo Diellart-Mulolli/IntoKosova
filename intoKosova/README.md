@@ -52,6 +52,7 @@ npx expo start
 
 
 Scan the QR code in the terminal or browser using the Expo Go app on your phone to view the app.
+```
 
 #### Technologies Used
 Area	Technology
