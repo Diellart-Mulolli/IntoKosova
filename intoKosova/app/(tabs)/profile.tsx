@@ -31,7 +31,6 @@ export default function ProfileScreen() {
   const [verificationCode, setVerificationCode] = useState("");
   const [sentCode, setSentCode] = useState(null);
 
-  // Helper function
   const generateCode = () =>
     Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -52,7 +51,7 @@ export default function ProfileScreen() {
       return;
     }
 
-    // Validate date
+  
     const regex =
       /^([0-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
     if (!regex.test(birthDate)) {
