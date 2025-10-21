@@ -43,9 +43,7 @@ export default function ProfileScreen() {
     return age;
   };
 
-  // =====================
-  // SIGN UP
-  // =====================
+
   const handleSignUp = () => {
     setErrorMessage("");
 
@@ -75,7 +73,7 @@ export default function ProfileScreen() {
       return;
     }
 
-    // Validate email or phone
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
     const isEmail = emailRegex.test(emailOrPhone);
@@ -85,7 +83,7 @@ export default function ProfileScreen() {
       return;
     }
 
-    // Validate password
+   
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
     if (!passwordRegex.test(password)) {
@@ -95,7 +93,7 @@ export default function ProfileScreen() {
       return;
     }
 
-    // Prevent duplicate
+   
     const exists = registeredUsers.some(
       (u) => u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
     );
@@ -111,9 +109,7 @@ export default function ProfileScreen() {
     Alert.alert("🎉 Account created!", "Welcome to IntoKosova!");
   };
 
-  // =====================
-  // SIGN IN
-  // =====================
+ 
   const handleSignIn = () => {
     const foundUser = registeredUsers.find(
       (u) =>
@@ -140,9 +136,7 @@ export default function ProfileScreen() {
     }
   };
 
-  // =====================
-  // FORGOT PASSWORD FLOW
-  // =====================
+
   const handleSendVerification = () => {
     const foundUser = registeredUsers.find(
       (u) => u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
@@ -200,9 +194,7 @@ export default function ProfileScreen() {
     setPassword("");
   };
 
-  // =====================
-  // AUTH SCREENS
-  // =====================
+ 
   if (!isAuthenticated) {
     return (
       <SafeAreaView style={styles.authContainer}>
@@ -406,9 +398,7 @@ export default function ProfileScreen() {
     );
   }
 
-  // =====================
-  // PROFILE
-  // =====================
+ 
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
