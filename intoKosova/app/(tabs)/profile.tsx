@@ -12,6 +12,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { colors } from "@/styles/commonStyles";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase"; 
+import { AntDesign } from "@expo/vector-icons";
 
 export default function ProfileScreen() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -192,6 +195,39 @@ export default function ProfileScreen() {
     setEmailOrPhone("");
     setPassword("");
   };
+
+  //per google sign in
+  const handleGoogleLogin = async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const result = await signInWithPopup(auth, provider);
+
+    //Merr te dhenat e perdoruesit nga Firebase
+    const user = result.user;
+    const newUser = {
+      emailOrPhone: user.email || user.phoneNumber || "",
+      fullName: user.displayName || "Google User",
+      birthDate: "", 
+      password: "",  
+    };
+
+    const exists = registeredUsers.some(
+      (u) => u.emailOrPhone.toLowerCase() === newUser.emailOrPhone.toLowerCase()
+    );
+
+    if (!exists) {
+      setRegisteredUsers([...registeredUsers, newUser]);
+    }
+
+    setCurrentUser(newUser);
+    setIsAuthenticated(true);
+    setErrorMessage("");
+  } catch (error: any) {
+    console.log("Google Login Error:", error);
+    setErrorMessage("Failed to sign in with Google: " + error.message);
+  }
+};
 
  
   if (!isAuthenticated) {
@@ -375,6 +411,14 @@ export default function ProfileScreen() {
                 </Text>
               </Pressable>
 
+                   {/* GOOGLE SIGN IN BUTTON */}
+              {!isSignUp && !forgotPassword && (
+                <Pressable style={styles.googleBtn} onPress={handleGoogleLogin}>
+                  <AntDesign name="google" size={22} color="#DB4437" style={{ marginRight: 8 }} />
+                <Text style={styles.googleText}>Continue with Google</Text>
+                </Pressable>
+                )}
+
               {!isSignUp && (
                 <Pressable onPress={() => setForgotPassword(true)}>
                   <Text style={[styles.linkText, { marginTop: 8 }]}>
@@ -390,6 +434,7 @@ export default function ProfileScreen() {
                     : "Don't have an account? Sign Up"}
                 </Text>
               </Pressable>
+              
             </>
           )}
         </Animated.View>
@@ -465,6 +510,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 8,
+    backgroundColor: "#007AFF",
   },
   buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
   linkText: {
@@ -510,5 +556,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     marginBottom: 50,
+  },
+  googleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginTop: 12,
+    width: 300,
+  },
+  googleText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
