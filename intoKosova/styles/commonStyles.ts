@@ -22,7 +22,6 @@ export const colors = {
     card: "#F5F5F5",
     tint: "#3182CE",
   },
-
   dark: {
     background: "#1A1A1A",
     text: "#FFFFFF",
@@ -44,7 +43,6 @@ export const colors = {
     tint: "#3182CE",
   },
 };
-
 export const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
