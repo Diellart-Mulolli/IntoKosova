@@ -3,16 +3,26 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { colors, commonStyles } from "@/styles/commonStyles";
-import { ScrollView, StyleSheet, View, Text, Pressable, Platform } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  Platform,
+} from "react-native";
 import { GlassView } from "expo-glass-effect";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+
+import { useThemeManager } from "../../contexts/ThemeContext";
 
 const features = [
   {
     id: 1,
     title: "Discover Heritage",
-    description: "Explore Kosovo's rich historical sites and cultural landmarks",
+    description:
+      "Explore Kosovo's rich historical sites and cultural landmarks",
     icon: "building.columns.fill",
     color: colors.primary,
   },
@@ -54,28 +64,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   titleText: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text,
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitleText: {
     fontSize: 16,
     color: colors.textSecondary,
     lineHeight: 22,
-    textAlign: 'center',
+    textAlign: "center",
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
   statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginBottom: 24,
     paddingVertical: 16,
     backgroundColor: colors.card,
@@ -91,35 +101,35 @@ const styles = StyleSheet.create({
         elevation: 4,
       },
       web: {
-        boxShadow: '0 4px 16px rgba(49, 130, 206, 0.15)',
+        boxShadow: "0 4px 16px rgba(49, 130, 206, 0.15)",
       },
     }),
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statIcon: {
     marginBottom: 8,
   },
   statValue: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.primary,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
     color: colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
   },
   featuresContainer: {
     paddingBottom: 100,
   },
   featureCard: {
-    width: '100%',
+    width: "100%",
     marginBottom: 16,
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     ...Platform.select({
       ios: {
         shadowColor: colors.primary,
@@ -131,7 +141,7 @@ const styles = StyleSheet.create({
         elevation: 6,
       },
       web: {
-        boxShadow: '0 6px 20px rgba(49, 130, 206, 0.15)',
+        boxShadow: "0 6px 20px rgba(49, 130, 206, 0.15)",
       },
     }),
   },
@@ -143,13 +153,13 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.lightBlue,
   },
   featureHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   featureIcon: {
     marginRight: 16,
-    marginTop:10,
+    marginTop: 10,
     padding: 12,
     backgroundColor: colors.lightBlue,
     borderRadius: 12,
@@ -159,7 +169,7 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: colors.text,
     marginBottom: 4,
   },
@@ -171,9 +181,10 @@ const styles = StyleSheet.create({
 });
 
 export default function HomeScreen() {
+  const { colors } = useThemeManager();
   const theme = useTheme();
 
-  const renderFeatureCard = (feature: typeof features[0], index: number) => {
+  const renderFeatureCard = (feature: (typeof features)[0], index: number) => {
     return (
       <Animated.View
         key={feature.id}
@@ -184,9 +195,16 @@ export default function HomeScreen() {
           onPress={() => console.log(`Feature pressed: ${feature.title}`)}
           android_ripple={{ color: colors.lightBlue }}
         >
-          <View style={[styles.featureContent, { borderLeftColor: feature.color }]}>
+          <View
+            style={[styles.featureContent, { borderLeftColor: feature.color }]}
+          >
             <View style={styles.featureHeader}>
-              <View style={[styles.featureIcon, { backgroundColor: `${feature.color}20` }]}>
+              <View
+                style={[
+                  styles.featureIcon,
+                  { backgroundColor: `${feature.color}20` },
+                ]}
+              >
                 <IconSymbol
                   name={feature.icon}
                   size={28}
@@ -195,7 +213,9 @@ export default function HomeScreen() {
               </View>
               <View style={styles.featureTextContainer}>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>{feature.description}</Text>
+                <Text style={styles.featureDescription}>
+                  {feature.description}
+                </Text>
               </View>
             </View>
           </View>
@@ -205,58 +225,107 @@ export default function HomeScreen() {
   };
 
   const renderHeaderRight = () => (
-    <Pressable onPress={() => console.log('Notifications pressed')}>
+    <Pressable onPress={() => console.log("Notifications pressed")}>
       <IconSymbol name="bell.fill" size={24} color={colors.text} />
     </Pressable>
   );
 
   const renderHeaderLeft = () => (
-    <Pressable onPress={() => console.log('Menu pressed')}>
+    <Pressable onPress={() => console.log("Menu pressed")}>
       <IconSymbol name="line.horizontal.3" size={24} color={colors.text} />
     </Pressable>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={["top"]}
+    >
       <Stack.Screen
         options={{
           headerShown: false,
         }}
       />
-      
-      <Animated.View entering={FadeInUp.springify()} style={styles.header}>
-        <Text style={styles.titleText}>intoKosova</Text>
-        <Text style={styles.subtitleText}>
-          Discover the heart of the Balkans through its rich history, stunning landscapes, and vibrant culture
+
+      <Animated.View
+        entering={FadeInUp.springify()}
+        style={{
+          paddingHorizontal: 20,
+          paddingTop: 20,
+          paddingBottom: 10,
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 32,
+            fontWeight: "bold",
+            color: colors.text,
+            marginBottom: 8,
+            textAlign: "center",
+          }}
+        >
+          intoKosova
+        </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            color: colors.textSecondary,
+            lineHeight: 22,
+            textAlign: "center",
+          }}
+        >
+          Discover the heart of the Balkans through its rich history, stunning
+          landscapes, and vibrant culture
         </Text>
       </Animated.View>
 
-      <ScrollView 
-        style={styles.content}
+      <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       >
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.delay(200).springify()}
-          style={styles.statsContainer}
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            marginBottom: 24,
+            paddingVertical: 16,
+            backgroundColor: colors.card,
+            borderRadius: 16,
+          }}
         >
           {stats.map((stat, index) => (
-            <View key={index} style={styles.statItem}>
-              <View style={styles.statIcon}>
-                <IconSymbol
-                  name={stat.icon}
-                  size={20}
-                  color={colors.primary}
-                />
-              </View>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+            <View key={index} style={{ alignItems: "center" }}>
+              <IconSymbol name={stat.icon} size={20} color={colors.primary} />
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  color: colors.primary,
+                  marginBottom: 4,
+                }}
+              >
+                {stat.value}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: colors.textSecondary,
+                  textAlign: "center",
+                }}
+              >
+                {stat.label}
+              </Text>
             </View>
           ))}
         </Animated.View>
 
-        <View style={styles.featuresContainer}>
-          {features.map((feature, index) => renderFeatureCard(feature, index))}
+        <View>
+          {features.map((feature, index) =>
+            renderFeatureCard(feature, index, colors)
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
