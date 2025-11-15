@@ -312,22 +312,29 @@ export default function HomeScreen() {
       >
         {/* WEATHER */}
         {weather && (
-          <Animated.View
-            entering={FadeInUp.delay(120).springify()}
-            style={{
-              backgroundColor: palette.card,
-              borderRadius: 14,
-              padding: 14,
-              marginBottom: 20,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              ...Platform.select({
-                ios: { shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 8 },
-                android: { elevation: 3 },
-              }),
-            }}
-          >
+       <Animated.View
+  entering={FadeInUp.delay(120).springify()}
+  style={{
+    backgroundColor: palette.card,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    ...Platform.select({
+      ios: {
+        shadowColor: palette.primary,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: { elevation: 6 },
+      web: { boxShadow: "0 6px 20px rgba(49,130,206,0.15)" },
+    }),
+  }}
+>
+
             <View>
               <Text
                 style={{ fontSize: 18, fontWeight: "600", color: palette.text }}
