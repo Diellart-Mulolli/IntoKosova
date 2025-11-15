@@ -352,22 +352,46 @@ export default function HomeScreen() {
                 {weather.desc}
               </Text>
             </View>
+<View style={{ alignItems: "center" }}>
 
-            <View style={{ alignItems: "center" }}>
-             <Image
-  source={weatherIcons[weather.icon] || weatherIcons["unknown"]}
-  style={{ width: 60, height: 60 }}
-  resizeMode="contain"
-/>
+  {/* Weather Icon Animation */}
+  <Animated.View
+    entering={FadeInUp
+      .duration(700)
+      .springify()
+      .damping(14)
+      .delay(150)}
+  >
+    <Image
+      source={weatherIcons[weather.icon] || weatherIcons["unknown"]}
+      style={{ width: 60, height: 60 }}
+      resizeMode="contain"
+    />
+  </Animated.View>
 
+  {/* Temperature Animation */}
+  <Animated.View
+    entering={FadeInDown
+      .duration(700)
+      .springify()
+      .mass(0.7)
+      .damping(12)
+      .delay(300)}
+    style={{ marginTop: 4 }}
+  >
+    <Text
+      style={{
+        fontSize: 20,
+        fontWeight: "700",
+        color: palette.primary,
+      }}
+    >
+      {weather.temp}°C
+    </Text>
+  </Animated.View>
 
+</View>
 
-              <Text
-                style={{ fontSize: 20, fontWeight: "700", color: palette.primary }}
-              >
-                {weather.temp}°C
-              </Text>
-            </View>
           </Animated.View>
         )}
 
