@@ -456,15 +456,15 @@ export default function ProfileScreen() {
       <ScrollView style={{ paddingHorizontal: 20 }}>
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statNumber}>0</Text>
             <Text style={styles.statLabel}>Places Visited</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>8</Text>
+            <Text style={styles.statNumber}>0</Text>
             <Text style={styles.statLabel}>Favorites</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>24</Text>
+            <Text style={styles.statNumber}>0</Text>
             <Text style={styles.statLabel}>Photos</Text>
           </View>
         </View>
