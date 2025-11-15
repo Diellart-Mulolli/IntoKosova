@@ -1,16 +1,37 @@
 export const Colors = {
   light: {
-    text: '#000',
-    background: '#fff',
-    tint: '#2f95dc', // Default tint
-    activeTint: '#2f95dc', // Light blue for active tab
-    inactiveTint: '#666', // Optional: for inactive tabs
+    text: "#000",
+    textSecondary: "#666",
+
+    background: "#fff",
+    card: "#f2f2f2",
+
+    primary: "#2f95dc",
+    accent: "#38B2AC",
+    secondary: "#805AD5",
+    highlight: "#F6AD55",
+    lightBlue: "#BEE3F8",
+
+    tint: "#2f95dc",
+    activeTint: "#2f95dc",
+    inactiveTint: "#666",
   },
+
   dark: {
-    text: '#fff',
-    background: '#000',
-    tint: '#2f95dc', // Default tint
-    activeTint: '#4da8ff', // Slightly lighter blue for dark mode
-    inactiveTint: '#999', // Optional: for inactive tabs
+    text: "#fff",
+    textSecondary: "#ccc",
+
+    background: "#000",
+    card: "#111",
+
+    primary: "#4da8ff",
+    accent: "#4FD1C5",
+    secondary: "#B794F4",
+    highlight: "#F6AD55",
+    lightBlue: "#2A4365",
+
+    tint: "#2f95dc",
+    activeTint: "#4da8ff",
+    inactiveTint: "#999",
   },
 };
