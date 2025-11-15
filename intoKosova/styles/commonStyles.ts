@@ -43,6 +43,7 @@ export const colors = {
     tint: "#3182CE",
   },
 };
+
 export const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
