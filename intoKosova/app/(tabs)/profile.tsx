@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { colors } from "@/styles/commonStyles";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth } from "../../firebase"; 
 import { AntDesign } from "@expo/vector-icons";
 
@@ -46,13 +46,13 @@ export default function ProfileScreen() {
   };
 
 
-  const handleSignUp = () => {
+ const handleSignUp = async () => {
     setErrorMessage("");
 
-    if (!emailOrPhone || !password || !fullName || !birthDate) {
-      setErrorMessage("Please fill all fields to sign up.");
-      return;
-    }
+  if (!emailOrPhone || !password || !fullName || !birthDate) {
+    setErrorMessage("Please fill all fields to sign up.");
+    return;
+  }
 
   
     const regex =
@@ -96,47 +96,36 @@ export default function ProfileScreen() {
     }
 
    
-    const exists = registeredUsers.some(
-      (u) => u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
-    );
-    if (exists) {
-      Alert.alert("Account exists", "This email or phone number is already registered.");
-      return;
-    }
-
-    const newUser = { emailOrPhone, password, fullName, birthDate };
-    setRegisteredUsers([...registeredUsers, newUser]);
-    setCurrentUser(newUser);
+    
+    try {
+    const userCredential = await createUserWithEmailAndPassword(auth, emailOrPhone, password);
+    const user = userCredential.user;
+    setCurrentUser({ email: user.email, displayName: fullName });
     setIsAuthenticated(true);
-    Alert.alert("🎉 Account created!", "Welcome to IntoKosova!");
+    Alert.alert("🎉 Account created!", `Welcome, ${fullName}!`);
+  } catch (error: any) {
+    setErrorMessage(error.message);
+  }
   };
 
  
-  const handleSignIn = () => {
-    const foundUser = registeredUsers.find(
-      (u) =>
-        u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase() &&
-        u.password === password
-    );
+    const handleSignIn = async () => {
+  setErrorMessage("");
 
-    if (foundUser) {
-      setIsAuthenticated(true);
-      setCurrentUser(foundUser);
-      setErrorMessage("");
-      setAttempts(0);
-    } else {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-      if (newAttempts >= 5) {
-        Alert.alert(
-          "Too many attempts",
-          "You’ve reached the maximum of 5 login attempts. Try again later."
-        );
-        return;
-      }
-      setErrorMessage("Incorrect credentials. Please try again.");
-    }
-  };
+  if (!emailOrPhone || !password) {
+    setErrorMessage("Both fields are required.");
+    return;
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, emailOrPhone, password);
+    const user = userCredential.user;
+    setCurrentUser({ email: user.email, displayName: user.displayName || "" });
+    setIsAuthenticated(true);
+  } catch (error: any) {
+    setErrorMessage("Incorrect email or password");
+  }
+};
 
 
   const handleSendVerification = () => {
@@ -189,12 +178,20 @@ export default function ProfileScreen() {
     setSentCode(null);
   };
 
-  const handleLogout = () => {
+const handleLogout = async () => {
+  try {
+    await signOut(auth);  // kyç përdoruesin nga Firebase
     setIsAuthenticated(false);
     setCurrentUser(null);
     setEmailOrPhone("");
     setPassword("");
-  };
+    setErrorMessage(""); // opsionale, hiq çdo error
+  } catch (error: any) {
+    console.log("Logout error:", error.message);
+    Alert.alert("Logout failed", error.message);
+  }
+};
+
 
   //per google sign in
   const handleGoogleLogin = async () => {
@@ -442,8 +439,7 @@ export default function ProfileScreen() {
     );
   }
 
- 
-  return (
+   return (
     <SafeAreaView style={styles.container}>
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
         <View style={styles.profileImage}>
@@ -456,15 +452,15 @@ export default function ProfileScreen() {
       <ScrollView style={{ paddingHorizontal: 20 }}>
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statNumber}>0</Text>
             <Text style={styles.statLabel}>Places Visited</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>8</Text>
+            <Text style={styles.statNumber}>0</Text>
             <Text style={styles.statLabel}>Favorites</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>24</Text>
+            <Text style={styles.statNumber}>0</Text>
             <Text style={styles.statLabel}>Photos</Text>
           </View>
         </View>
