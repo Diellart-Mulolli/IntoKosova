@@ -219,32 +219,116 @@ export default function HomeScreen() {
 
   const [weather, setWeather] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [weatherError, setWeatherError] = useState(false);
 
-  const fetchWeather = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
+const fetchWeather = async () => {
+  try {
+    setWeatherError(false);
 
-      const loc = await Location.getCurrentPositionAsync({});
-      const { latitude: lat, longitude: lon } = loc.coords;
-
-      const apiKey = "6068fce306e355cd321c53a65029295b";
-
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
-      );
-      const data = await res.json();
-
-      setWeather({
-        temp: Math.round(data.main.temp),
-        city: data.name,
-        desc: data.weather[0].description,
-        icon: data.weather[0].icon,
-      });
-    } catch (e) {
-      console.log("Weather error:", e);
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setWeatherError(true);
+      return;
     }
+
+    const loc = await Location.getCurrentPositionAsync({});
+    const { latitude: lat, longitude: lon } = loc.coords;
+
+    const apiKey = "6068fce306e355cd321c53a65029295b";
+
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
+    );
+
+    if (!res.ok) {
+      setWeatherError(true);
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!data?.main?.temp) {
+      setWeatherError(true);
+      return;
+    }
+
+    setWeather({
+      temp: Math.round(data.main.temp),
+      city: data.name,
+      desc: data.weather[0].description,
+      icon: data.weather[0].icon,
+    });
+  } catch (e) {
+    console.log("Weather error:", e);
+    setWeatherError(true);
+  }
+};
+
+
+const WeatherErrorCard = () => {
+  const messages: any = {
+    location: {
+      icon: "📍",
+      title: "Location Disabled",
+      desc: "Enable location services to get weather updates.",
+    },
+    network: {
+      icon: "🌐",
+      title: "No Internet",
+      desc: "Please connect to the internet.",
+    },
+    api: {
+      icon: "🔑",
+      title: "API Error",
+      desc: "Weather service configuration error.",
+    },
+    unknown: {
+      icon: "❓",
+      title: "Unknown Error",
+      desc: "Something went wrong.",
+    },
   };
+
+  const msg = messages[weatherError ?? "unknown"];
+
+  return (
+    <Animated.View
+      entering={FadeInUp.springify().duration(600)}
+      style={{
+        backgroundColor: palette.card,
+        borderRadius: 14,
+        padding: 18,
+        marginBottom: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        ...Platform.select({
+          ios: {
+            shadowColor: palette.primary,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+          },
+          android: { elevation: 6 },
+        }),
+      }}
+    >
+      <Text style={{ fontSize: 42, marginBottom: 8 }}>{msg.icon}</Text>
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: "700",
+          color: palette.text,
+          marginBottom: 4,
+        }}
+      >
+        {msg.title}
+      </Text>
+      <Text style={{ fontSize: 14, color: palette.textSecondary }}>
+        {msg.desc}
+      </Text>
+    </Animated.View>
+  );
+};
 
   useEffect(() => {
     fetchWeather();
@@ -318,83 +402,86 @@ export default function HomeScreen() {
         }
       >
         {/* WEATHER */}
-        {weather && (
-       <Animated.View
-  entering={FadeInUp.delay(120).springify()}
-  style={{
-    backgroundColor: palette.card,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    ...Platform.select({
-      ios: {
-        shadowColor: palette.primary,
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
-      android: { elevation: 6 },
-      web: { boxShadow: "0 6px 20px rgba(49,130,206,0.15)" },
-    }),
-  }}
->
-
-            <View>
-              <Text
-                style={{ fontSize: 18, fontWeight: "600", color: palette.text }}
-              >
-                {weather.city}
-              </Text>
-              <Text style={{ fontSize: 14, color: palette.textSecondary }}>
-                {weather.desc}
-              </Text>
-            </View>
-<View style={{ alignItems: "center" }}>
-
-  {/* Weather Icon Animation */}
+        {/* WEATHER SUCCESS */}
+{weather && !weatherError && (
   <Animated.View
-    entering={FadeInUp
-      .duration(700)
-      .springify()
-      .damping(14)
-      .delay(150)}
+    entering={FadeInUp.delay(120).springify()}
+    style={{
+      backgroundColor: palette.card,
+      borderRadius: 14,
+      padding: 14,
+      marginBottom: 20,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      ...Platform.select({
+        ios: {
+          shadowColor: palette.primary,
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+        },
+        android: { elevation: 6 },
+        web: { boxShadow: "0 6px 20px rgba(49,130,206,0.15)" },
+      }),
+    }}
   >
-    <Image
-      source={weatherIcons[weather.icon] || weatherIcons["unknown"]}
-      style={{ width: 60, height: 60 }}
-      resizeMode="contain"
-    />
+    <View>
+      <Text style={{ fontSize: 18, fontWeight: "600", color: palette.text }}>
+        {weather.city}
+      </Text>
+      <Text style={{ fontSize: 14, color: palette.textSecondary }}>
+        {weather.desc}
+      </Text>
+    </View>
+
+    <View style={{ alignItems: "center" }}>
+      <Image
+        source={weatherIcons[weather.icon] || weatherIcons["01d"]}
+        style={{ width: 60, height: 60 }}
+        resizeMode="contain"
+      />
+
+      <Text
+        style={{ fontSize: 20, fontWeight: "700", color: palette.primary }}
+      >
+        {weather.temp}°C
+      </Text>
+    </View>
   </Animated.View>
+)}
 
-  {/* Temperature Animation */}
+{/* WEATHER ERROR */}
+{weatherError && (
   <Animated.View
-    entering={FadeInDown
-      .duration(700)
-      .springify()
-      .mass(0.7)
-      .damping(12)
-      .delay(300)}
-    style={{ marginTop: 4 }}
+    entering={FadeInUp.delay(120).springify()}
+    style={{
+      backgroundColor: palette.card,
+      borderRadius: 14,
+      padding: 16,
+      marginBottom: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      ...Platform.select({
+        ios: {
+          shadowColor: palette.primary,
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+        },
+        android: { elevation: 6 },
+        web: { boxShadow: "0 6px 20px rgba(49,130,206,0.15)" },
+      }),
+    }}
   >
-    <Text
-      style={{
-        fontSize: 20,
-        fontWeight: "700",
-        color: palette.primary,
-      }}
-    >
-      {weather.temp}°C
+    <Text style={{ fontSize: 16, fontWeight: "600", color: palette.text }}>
+      Unable to load weather
+    </Text>
+    <Text style={{ fontSize: 13, color: palette.textSecondary, marginTop: 4 }}>
+      Pull down to retry
     </Text>
   </Animated.View>
-
-</View>
-
-          </Animated.View>
-        )}
-
+)}
         {/* STATISTICS */}
         <Animated.View
   entering={FadeInUp.delay(200).springify()}
