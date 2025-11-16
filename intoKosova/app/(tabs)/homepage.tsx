@@ -24,6 +24,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // ------------------------------------
 const WEATHER_CACHE_KEY = "weather_cache";
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const fetchWithTimeout = (url: string, options: any = {}, timeout = 3000) => {
+  return Promise.race([
+    fetch(url, options),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), timeout)
+    ),
+  ]);
+};
+
+// Network check
+import NetInfo from "@react-native-community/netinfo";
+
 
 const weatherIcons: any = {
   "01d": require("@/assets/weather/sun.png"),
@@ -52,6 +64,29 @@ const weatherIcons: any = {
 
   "50d": require("@/assets/weather/fog.png"),
   "50n": require("@/assets/weather/fog.png"),
+};
+
+const errorMessages = {
+  location: {
+    icon: "📍",
+    title: "Location Disabled",
+    desc: "Enable location services to see local weather.",
+  },
+  network: {
+    icon: "🌐",
+    title: "No Internet Connection",
+    desc: "Please check your network and try again.",
+  },
+  api: {
+    icon: "🔑",
+    title: "Weather Service Error",
+    desc: "There was an issue fetching weather data.",
+  },
+  unknown: {
+    icon: "❓",
+    title: "Unexpected Error",
+    desc: "Something went wrong.",
+  },
 };
 
 
@@ -210,6 +245,7 @@ const createStyles = (palette: any) =>
     },
   });
 
+  
 // ------------------------------------
 // MAIN SCREEN
 // ------------------------------------
@@ -222,30 +258,27 @@ export default function HomeScreen() {
 
   const [weather, setWeather] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [weatherError, setWeatherError] = useState(false);
+  const [weatherError, setWeatherError] = useState<null | "location" | "network" | "api" | "unknown">(null);
 
 const fetchWeather = async (forceRefresh = false) => {
   try {
-    // 1) Kontrollo cache
     if (!forceRefresh) {
       const cached = await AsyncStorage.getItem(WEATHER_CACHE_KEY);
-
       if (cached) {
         const cachedData = JSON.parse(cached);
         const now = Date.now();
-
-        // Nëse ka kaluar më pak se 10 minuta → përdor cache
         if (now - cachedData.timestamp < CACHE_DURATION) {
           setWeather(cachedData.weather);
+          setWeatherError(null);
           return;
         }
       }
     }
 
-    // 2) Lejet e lokacionit
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      setWeatherError(true);
+      setWeather(null);
+      setWeatherError("location");
       return;
     }
 
@@ -254,12 +287,31 @@ const fetchWeather = async (forceRefresh = false) => {
 
     const apiKey = "6068fce306e355cd321c53a65029295b";
 
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
-    );
+    // Kontrollo rrjetin — vetem NJE HERË
+    const net = await NetInfo.fetch();
+    if (!net.isConnected) {
+      setWeather(null);
+      setWeatherError("network");
+      return;
+    }
+
+    // Fetch me timeout
+    let res;
+    try {
+      res = await fetchWithTimeout(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`,
+        {},
+        3000
+      );
+    } catch (err: any) {
+      setWeather(null);
+      setWeatherError(err.message === "timeout" ? "network" : "unknown");
+      return;
+    }
 
     if (!res.ok) {
-      setWeatherError(true);
+      setWeather(null);
+      setWeatherError("api");
       return;
     }
 
@@ -272,23 +324,22 @@ const fetchWeather = async (forceRefresh = false) => {
       icon: data.weather[0].icon,
     };
 
-    // 3) Ruaj në cache
     await AsyncStorage.setItem(
       WEATHER_CACHE_KEY,
-      JSON.stringify({
-        timestamp: Date.now(),
-        weather: parsedWeather,
-      })
+      JSON.stringify({ timestamp: Date.now(), weather: parsedWeather })
     );
 
     setWeather(parsedWeather);
-    setWeatherError(false);
+    setWeatherError(null);
 
   } catch (e) {
-    console.log("Weather error:", e);
-    setWeatherError(true);
+    console.log("Weather unknown error:", e);
+    setWeather(null);
+    setWeatherError("unknown");
   }
 };
+
+
 
 
 const WeatherErrorCard = () => {
@@ -498,18 +549,38 @@ const WeatherErrorCard = () => {
           shadowRadius: 12,
         },
         android: { elevation: 6 },
-        web: { boxShadow: "0 6px 20px rgba(49,130,206,0.15)" },
       }),
     }}
   >
+    <Text style={{ fontSize: 42 }}>{errorMessages[weatherError].icon}</Text>
+
     <Text style={{ fontSize: 16, fontWeight: "600", color: palette.text }}>
-      Unable to load weather
+      {errorMessages[weatherError].title}
     </Text>
-    <Text style={{ fontSize: 13, color: palette.textSecondary, marginTop: 4 }}>
+
+    <Text
+      style={{
+        fontSize: 13,
+        color: palette.textSecondary,
+        marginTop: 4,
+        textAlign: "center",
+      }}
+    >
+      {errorMessages[weatherError].desc}
+    </Text>
+
+    <Text
+      style={{
+        marginTop: 6,
+        fontSize: 12,
+        color: palette.primary,
+      }}
+    >
       Pull down to retry
     </Text>
   </Animated.View>
 )}
+
         {/* STATISTICS */}
         <Animated.View
   entering={FadeInUp.delay(200).springify()}
