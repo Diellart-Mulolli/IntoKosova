@@ -11,12 +11,23 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { colors } from "@/styles/commonStyles";
+import { useThemeManager } from "@/contexts/ThemeContext";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { auth } from "../../firebase"; 
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { auth } from "../../firebase";
 import { AntDesign } from "@expo/vector-icons";
 
 export default function ProfileScreen() {
+  const { colorScheme } = useThemeManager();
+  const theme = colors[colorScheme];
+
+  /* ---------------- AUTH STATES ---------------- */
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [forgotPassword, setForgotPassword] = useState(false);
@@ -27,7 +38,6 @@ export default function ProfileScreen() {
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [attempts, setAttempts] = useState(0);
   const [registeredUsers, setRegisteredUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [newPassword, setNewPassword] = useState("");
@@ -45,427 +55,260 @@ export default function ProfileScreen() {
     return age;
   };
 
-
- const handleSignUp = async () => {
+  /* ---------------- SIGNUP HANDLER ---------------- */
+  const handleSignUp = async () => {
     setErrorMessage("");
 
-  if (!emailOrPhone || !password || !fullName || !birthDate) {
-    setErrorMessage("Please fill all fields to sign up.");
-    return;
-  }
+    if (!emailOrPhone || !password || !fullName || !birthDate) {
+      setErrorMessage("Please fill all fields to sign up.");
+      return;
+    }
 
-  
-    const regex =
-      /^([0-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
+    const regex = /^([0-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
     if (!regex.test(birthDate)) {
       setErrorMessage("Please enter a valid birth date (DD/MM/YYYY).");
       return;
     }
 
-    const [day, month, year] = birthDate.split("/").map(Number);
-    const date = new Date(year, month - 1, day);
-    if (date.getDate() !== day || date.getMonth() + 1 !== month) {
-      setErrorMessage("Please enter a valid calendar date.");
-      return;
-    }
-
-    const age = calculateAge(day, month, year);
-    if (age < 16) {
-      setErrorMessage("You must be at least 16 years old to register.");
-      return;
-    }
-
-  
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
-    const isEmail = emailRegex.test(emailOrPhone);
-    const isPhone = phoneRegex.test(emailOrPhone);
-    if (!isEmail && !isPhone) {
-      setErrorMessage("Please enter a valid email or phone number.");
-      return;
-    }
-
-   
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
-    if (!passwordRegex.test(password)) {
-      setErrorMessage(
-        "Password must have at least 8 characters, one uppercase letter, and one special character."
-      );
-      return;
-    }
-
-   
-    
     try {
-    const userCredential = await createUserWithEmailAndPassword(auth, emailOrPhone, password);
-    const user = userCredential.user;
-    setCurrentUser({ email: user.email, displayName: fullName });
-    setIsAuthenticated(true);
-    Alert.alert("🎉 Account created!", `Welcome, ${fullName}!`);
-  } catch (error: any) {
-    setErrorMessage(error.message);
-  }
-  };
-
- 
-    const handleSignIn = async () => {
-  setErrorMessage("");
-
-  if (!emailOrPhone || !password) {
-    setErrorMessage("Both fields are required.");
-    return;
-  }
-
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, emailOrPhone, password);
-    const user = userCredential.user;
-    setCurrentUser({ email: user.email, displayName: user.displayName || "" });
-    setIsAuthenticated(true);
-  } catch (error: any) {
-    setErrorMessage("Incorrect email or password");
-  }
-};
-
-
-  const handleSendVerification = () => {
-    const foundUser = registeredUsers.find(
-      (u) => u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
-    );
-    if (!foundUser) {
-      setErrorMessage("No account found with this email or phone.");
-      return;
-    }
-
-    const code = generateCode();
-    setSentCode(code);
-    setVerificationStep(2);
-    Alert.alert("📩 Verification Code Sent", `A 6-digit code has been sent (simulated).`);
-    setErrorMessage("");
-  };
-
-  const handleVerifyCode = () => {
-    if (verificationCode === sentCode) {
-      setVerificationStep(3);
-      setErrorMessage("");
-    } else {
-      setErrorMessage("Invalid verification code.");
-    }
-  };
-
-  const handleChangePassword = () => {
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
-    if (!passwordRegex.test(newPassword)) {
-      setErrorMessage(
-        "Password must have at least 8 characters, one uppercase letter, and one special character."
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        emailOrPhone,
+        password
       );
-      return;
+      const user = userCredential.user;
+
+      setCurrentUser({ fullName, emailOrPhone: user.email });
+      setIsAuthenticated(true);
+      Alert.alert("🎉 Account created!", `Welcome, ${fullName}!`);
+    } catch (error: any) {
+      setErrorMessage(error.message);
     }
-
-    const updatedUsers = registeredUsers.map((u) =>
-      u.emailOrPhone.toLowerCase() === emailOrPhone.toLowerCase()
-        ? { ...u, password: newPassword }
-        : u
-    );
-    setRegisteredUsers(updatedUsers);
-
-    Alert.alert("✅ Password Updated", "You can now log in with your new password.");
-    setForgotPassword(false);
-    setVerificationStep(1);
-    setNewPassword("");
-    setVerificationCode("");
-    setSentCode(null);
   };
 
-const handleLogout = async () => {
-  try {
-    await signOut(auth);  // kyç përdoruesin nga Firebase
+  /* ---------------- LOGIN HANDLER ---------------- */
+  const handleSignIn = async () => {
+    setErrorMessage("");
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        emailOrPhone,
+        password
+      );
+
+      const user = userCredential.user;
+
+      setCurrentUser({
+        fullName: user.displayName || "",
+        emailOrPhone: user.email,
+      });
+
+      setIsAuthenticated(true);
+    } catch (error) {
+      setErrorMessage("Incorrect email or password");
+    }
+  };
+
+  /* ---------------- GOOGLE LOGIN ---------------- */
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const newUser = {
+        emailOrPhone: user.email,
+        fullName: user.displayName || "Google User",
+      };
+
+      setCurrentUser(newUser);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setErrorMessage("Failed to sign in with Google.");
+    }
+  };
+
+  /* ---------------- LOGOUT ---------------- */
+  const handleLogout = async () => {
+    await signOut(auth);
     setIsAuthenticated(false);
     setCurrentUser(null);
-    setEmailOrPhone("");
-    setPassword("");
-    setErrorMessage(""); // opsionale, hiq çdo error
-  } catch (error: any) {
-    console.log("Logout error:", error.message);
-    Alert.alert("Logout failed", error.message);
-  }
-};
+  };
 
-
-  //per google sign in
-  const handleGoogleLogin = async () => {
-  try {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await signInWithPopup(auth, provider);
-
-    //Merr te dhenat e perdoruesit nga Firebase
-    const user = result.user;
-    const newUser = {
-      emailOrPhone: user.email || user.phoneNumber || "",
-      fullName: user.displayName || "Google User",
-      birthDate: "", 
-      password: "",  
-    };
-
-    const exists = registeredUsers.some(
-      (u) => u.emailOrPhone.toLowerCase() === newUser.emailOrPhone.toLowerCase()
-    );
-
-    if (!exists) {
-      setRegisteredUsers([...registeredUsers, newUser]);
-    }
-
-    setCurrentUser(newUser);
-    setIsAuthenticated(true);
-    setErrorMessage("");
-  } catch (error: any) {
-    console.log("Google Login Error:", error);
-    setErrorMessage("Failed to sign in with Google: " + error.message);
-  }
-};
-
- 
+  /* ---------------- AUTH UI ---------------- */
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={styles.authContainer}>
+      <SafeAreaView
+        style={[styles.authContainer, { backgroundColor: theme.background }]}
+      >
         <Animated.View entering={FadeInUp.springify()}>
-          <Text style={styles.authTitle}>
-            {forgotPassword
-              ? "Reset Password"
-              : isSignUp
-              ? "Create your account"
-              : "Welcome back"}
+          <Text style={[styles.authTitle, { color: theme.text }]}>
+            {isSignUp ? "Create your account" : "Welcome back"}
           </Text>
 
-          {forgotPassword ? (
-            <>
-              {verificationStep === 1 && (
-                <>
-                  <TextInput
-                    placeholder="Email or phone number"
-                    style={styles.input}
-                    value={emailOrPhone}
-                    onChangeText={setEmailOrPhone}
-                  />
-                  {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-                  <Pressable
-                    style={[styles.button, { backgroundColor: colors.primary }]}
-                    onPress={handleSendVerification}
-                  >
-                    <Text style={styles.buttonText}>Send Verification Code</Text>
-                  </Pressable>
-                </>
-              )}
-
-              {verificationStep === 2 && (
-                <>
-                  <TextInput
-                    placeholder="Enter verification code"
-                    style={styles.input}
-                    value={verificationCode}
-                    onChangeText={setVerificationCode}
-                    keyboardType="numeric"
-                  />
-                  {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-                  <Pressable
-                    style={[styles.button, { backgroundColor: colors.primary }]}
-                    onPress={handleVerifyCode}
-                  >
-                    <Text style={styles.buttonText}>Verify Code</Text>
-                  </Pressable>
-                </>
-              )}
-
-              {verificationStep === 3 && (
-                <>
-                  <TextInput
-                    placeholder="Enter new password"
-                    style={styles.input}
-                    value={newPassword}
-                    onChangeText={setNewPassword}
-                    secureTextEntry
-                  />
-                  {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-                  <Pressable
-                    style={[styles.button, { backgroundColor: colors.primary }]}
-                    onPress={handleChangePassword}
-                  >
-                    <Text style={styles.buttonText}>Change Password</Text>
-                  </Pressable>
-                </>
-              )}
-
-              <Pressable
-                onPress={() => {
-                  setForgotPassword(false);
-                  setVerificationStep(1);
-                }}
-              >
-                <Text style={styles.linkText}>Back to Sign In</Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              {isSignUp && (
-                <>
-                  <TextInput
-                    placeholder="Full name"
-                    style={styles.input}
-                    value={fullName}
-                    onChangeText={setFullName}
-                  />
-
-                  {/* ✅ Date input with validation */}
-                  <View style={{ width: "100%" }}>
-                    <TextInput
-                      placeholder="DD/MM/YYYY"
-                      style={[
-                        styles.input,
-                        {
-                          borderColor:
-                            errorMessage.includes("birth date") ||
-                            errorMessage.includes("16 years") ||
-                            errorMessage.includes("calendar")
-                              ? "#e63946"
-                              : "#ddd",
-                        },
-                      ]}
-                      value={birthDate}
-                      onChangeText={(text) => {
-                        let formatted = text.replace(/[^\d/]/g, "");
-                        if (formatted.length === 2 && !formatted.includes("/")) {
-                          formatted = formatted + "/";
-                        } else if (
-                          formatted.length === 5 &&
-                          formatted.lastIndexOf("/") === 2
-                        ) {
-                          formatted = formatted + "/";
-                        }
-                        if (formatted.length > 10) return;
-                        setBirthDate(formatted);
-
-                        const regex =
-                          /^([0-2][0-9]|3[0-1])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
-                        if (!regex.test(formatted)) return;
-
-                        const [day, month, year] = formatted.split("/").map(Number);
-                        const date = new Date(year, month - 1, day);
-                        if (date.getDate() !== day || date.getMonth() + 1 !== month) {
-                          setErrorMessage("Please enter a valid calendar date.");
-                          return;
-                        }
-
-                        const age = calculateAge(day, month, year);
-                        if (age < 16) {
-                          setErrorMessage("You must be at least 16 years old to register.");
-                        } else {
-                          setErrorMessage("");
-                        }
-                      }}
-                      keyboardType="numeric"
-                      maxLength={10}
-                    />
-                    {errorMessage &&
-                    (errorMessage.includes("birth date") ||
-                      errorMessage.includes("16 years") ||
-                      errorMessage.includes("calendar")) ? (
-                      <Text style={styles.errorText}>{errorMessage}</Text>
-                    ) : null}
-                  </View>
-                </>
-              )}
-
-              <TextInput
-                placeholder="Email or phone number"
-                style={styles.input}
-                value={emailOrPhone}
-                onChangeText={setEmailOrPhone}
-              />
-
-              <TextInput
-                placeholder="Password"
-                style={styles.input}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
-
-              {errorMessage &&
-              !errorMessage.includes("birth date") &&
-              !errorMessage.includes("calendar") &&
-              !errorMessage.includes("16 years") ? (
-                <Text style={styles.errorText}>{errorMessage}</Text>
-              ) : null}
-
-              <Pressable
-                style={[styles.button, { backgroundColor: colors.primary }]}
-                onPress={isSignUp ? handleSignUp : handleSignIn}
-              >
-                <Text style={styles.buttonText}>
-                  {isSignUp ? "Sign Up" : "Sign In"}
-                </Text>
-              </Pressable>
-
-                   {/* GOOGLE SIGN IN BUTTON */}
-              {!isSignUp && !forgotPassword && (
-                <Pressable style={styles.googleBtn} onPress={handleGoogleLogin}>
-                  <AntDesign name="google" size={22} color="#DB4437" style={{ marginRight: 8 }} />
-                <Text style={styles.googleText}>Continue with Google</Text>
-                </Pressable>
-                )}
-
-              {!isSignUp && (
-                <Pressable onPress={() => setForgotPassword(true)}>
-                  <Text style={[styles.linkText, { marginTop: 8 }]}>
-                    Forgot Password?
-                  </Text>
-                </Pressable>
-              )}
-
-              <Pressable onPress={() => setIsSignUp(!isSignUp)}>
-                <Text style={styles.linkText}>
-                  {isSignUp
-                    ? "Already have an account? Sign In"
-                    : "Don't have an account? Sign Up"}
-                </Text>
-              </Pressable>
-              
-            </>
+          {isSignUp && (
+            <TextInput
+              placeholder="Full name"
+              placeholderTextColor={theme.textSecondary}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colorScheme === "dark" ? "#1A1A1A" : "#fff",
+                  borderColor: colorScheme === "dark" ? "#333" : "#ddd",
+                  color: theme.text,
+                },
+              ]}
+              value={fullName}
+              onChangeText={setFullName}
+            />
           )}
+
+          <TextInput
+            placeholder="Email or phone number"
+            placeholderTextColor={theme.textSecondary}
+            style={[
+              styles.input,
+              {
+                backgroundColor: colorScheme === "dark" ? "#1A1A1A" : "#fff",
+                borderColor: colorScheme === "dark" ? "#333" : "#ddd",
+                color: theme.text,
+              },
+            ]}
+            value={emailOrPhone}
+            onChangeText={setEmailOrPhone}
+          />
+
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor={theme.textSecondary}
+            style={[
+              styles.input,
+              {
+                backgroundColor: colorScheme === "dark" ? "#1A1A1A" : "#fff",
+                borderColor: colorScheme === "dark" ? "#333" : "#ddd",
+                color: theme.text,
+              },
+            ]}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : null}
+
+          <Pressable
+            style={[
+              styles.button,
+              {
+                backgroundColor:
+                  colorScheme === "dark" ? "#005FCC" : theme.primary,
+              },
+            ]}
+            onPress={isSignUp ? handleSignUp : handleSignIn}
+          >
+            <Text style={styles.buttonText}>
+              {isSignUp ? "Sign Up" : "Sign In"}
+            </Text>
+          </Pressable>
+
+          {!isSignUp && (
+            <Pressable
+              style={[
+                styles.googleBtn,
+                {
+                  backgroundColor: colorScheme === "dark" ? "#111" : "#fff",
+                  borderColor: colorScheme === "dark" ? "#333" : "#ddd",
+                },
+              ]}
+              onPress={handleGoogleLogin}
+            >
+              <AntDesign name="google" size={22} color="#DB4437" />
+              <Text
+                style={[
+                  styles.googleText,
+                  { color: theme.text, marginLeft: 8 },
+                ]}
+              >
+                Continue with Google
+              </Text>
+            </Pressable>
+          )}
+
+          <Pressable onPress={() => setIsSignUp(!isSignUp)}>
+            <Text style={[styles.linkText, { color: theme.primary }]}>
+              {isSignUp
+                ? "Already have an account? Sign In"
+                : "Don't have an account? Sign Up"}
+            </Text>
+          </Pressable>
         </Animated.View>
       </SafeAreaView>
     );
   }
 
-   return (
-    <SafeAreaView style={styles.container}>
+  /* ---------------- PROFILE UI ---------------- */
+  return (
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+    >
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
-        <View style={styles.profileImage}>
+        <View style={[styles.profileImage, { backgroundColor: theme.primary }]}>
           <IconSymbol name="person.fill" size={40} color="#fff" />
         </View>
-        <Text style={styles.profileName}>{currentUser?.fullName}</Text>
-        <Text style={styles.profileEmail}>{currentUser?.emailOrPhone}</Text>
+
+        <Text style={[styles.profileName, { color: theme.text }]}>
+          {currentUser?.fullName}
+        </Text>
+        <Text style={[styles.profileEmail, { color: theme.textSecondary }]}>
+          {currentUser?.emailOrPhone}
+        </Text>
       </Animated.View>
 
       <ScrollView style={{ paddingHorizontal: 20 }}>
-        <View style={styles.statsContainer}>
+        <View
+          style={[
+            styles.statsContainer,
+            {
+              backgroundColor: colorScheme === "dark" ? "#111" : theme.card,
+            },
+          ]}
+        >
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>0</Text>
-            <Text style={styles.statLabel}>Places Visited</Text>
+            <Text style={[styles.statNumber, { color: theme.primary }]}>0</Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+              Places Visited
+            </Text>
           </View>
+
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>0</Text>
-            <Text style={styles.statLabel}>Favorites</Text>
+            <Text style={[styles.statNumber, { color: theme.primary }]}>0</Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+              Favorites
+            </Text>
           </View>
+
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>0</Text>
-            <Text style={styles.statLabel}>Photos</Text>
+            <Text style={[styles.statNumber, { color: theme.primary }]}>0</Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+              Photos
+            </Text>
           </View>
         </View>
 
-        <Pressable style={styles.logoutButton} onPress={handleLogout}>
+        <Pressable
+          style={[
+            styles.logoutButton,
+            {
+              backgroundColor: colorScheme === "dark" ? "#b91c1c" : "#FF6B6B",
+            },
+          ]}
+          onPress={handleLogout}
+        >
           <Text style={styles.buttonText}>Log Out</Text>
         </Pressable>
       </ScrollView>
@@ -473,30 +316,27 @@ const handleLogout = async () => {
   );
 }
 
+/* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1 },
   authContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 30,
-    backgroundColor: "#f9fafb",
   },
   authTitle: {
     fontSize: 26,
     fontWeight: "bold",
     marginBottom: 24,
-    color: colors.primary,
     textAlign: "center",
   },
   input: {
     width: 300,
-    backgroundColor: "#fff",
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 10,
     marginBottom: 14,
-    borderColor: "#ddd",
     borderWidth: 1,
     fontSize: 16,
   },
@@ -506,11 +346,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 8,
-    backgroundColor: "#007AFF",
   },
   buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
   linkText: {
-    color: colors.primary,
     marginTop: 16,
     textAlign: "center",
     fontWeight: "500",
@@ -527,47 +365,41 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
   },
-  profileName: { fontSize: 24, fontWeight: "700", color: colors.text },
-  profileEmail: { fontSize: 15, color: colors.textSecondary, marginBottom: 20 },
+  profileName: { fontSize: 24, fontWeight: "700" },
+  profileEmail: { fontSize: 15, marginBottom: 20 },
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 24,
     paddingVertical: 16,
-    backgroundColor: colors.card,
     borderRadius: 16,
   },
   statItem: { alignItems: "center" },
-  statNumber: { fontSize: 18, fontWeight: "bold", color: colors.primary },
-  statLabel: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  statNumber: { fontSize: 18, fontWeight: "bold" },
+  statLabel: { fontSize: 12, marginTop: 2 },
+  googleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginTop: 12,
+    width: 300,
+    borderWidth: 1,
+  },
+  googleText: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
   logoutButton: {
-    backgroundColor: "#FF6B6B",
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 20,
     marginBottom: 50,
-  },
-  googleBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    paddingVertical: 14,
-    borderRadius: 10,
-    marginTop: 12,
-    width: 300,
-  },
-  googleText: {
-    color: "#000",
-    fontSize: 16,
-    fontWeight: "500",
   },
 });
