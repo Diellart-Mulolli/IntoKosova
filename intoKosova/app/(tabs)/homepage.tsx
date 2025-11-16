@@ -17,10 +17,13 @@ import { GlassView } from "expo-glass-effect";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ------------------------------------
 // FEATURE LIST
 // ------------------------------------
+const WEATHER_CACHE_KEY = "weather_cache";
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 const weatherIcons: any = {
   "01d": require("@/assets/weather/sun.png"),
@@ -221,10 +224,25 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [weatherError, setWeatherError] = useState(false);
 
-const fetchWeather = async () => {
+const fetchWeather = async (forceRefresh = false) => {
   try {
-    setWeatherError(false);
+    // 1) Kontrollo cache
+    if (!forceRefresh) {
+      const cached = await AsyncStorage.getItem(WEATHER_CACHE_KEY);
 
+      if (cached) {
+        const cachedData = JSON.parse(cached);
+        const now = Date.now();
+
+        // Nëse ka kaluar më pak se 10 minuta → përdor cache
+        if (now - cachedData.timestamp < CACHE_DURATION) {
+          setWeather(cachedData.weather);
+          return;
+        }
+      }
+    }
+
+    // 2) Lejet e lokacionit
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       setWeatherError(true);
@@ -247,17 +265,25 @@ const fetchWeather = async () => {
 
     const data = await res.json();
 
-    if (!data?.main?.temp) {
-      setWeatherError(true);
-      return;
-    }
-
-    setWeather({
+    const parsedWeather = {
       temp: Math.round(data.main.temp),
       city: data.name,
       desc: data.weather[0].description,
       icon: data.weather[0].icon,
-    });
+    };
+
+    // 3) Ruaj në cache
+    await AsyncStorage.setItem(
+      WEATHER_CACHE_KEY,
+      JSON.stringify({
+        timestamp: Date.now(),
+        weather: parsedWeather,
+      })
+    );
+
+    setWeather(parsedWeather);
+    setWeatherError(false);
+
   } catch (e) {
     console.log("Weather error:", e);
     setWeatherError(true);
@@ -330,15 +356,17 @@ const WeatherErrorCard = () => {
   );
 };
 
-  useEffect(() => {
-    fetchWeather();
-  }, []);
+ useEffect(() => {
+  fetchWeather(false); 
+}, []);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchWeather();
-    setRefreshing(false);
-  };
+
+ const onRefresh = async () => {
+  setRefreshing(true);
+  await fetchWeather(true); // FORCE refresh
+  setRefreshing(false);
+};
+
 
   const renderFeatureCard = (feature: typeof features[0], index: number) => {
     const featureColor = palette[feature.colorKey];
