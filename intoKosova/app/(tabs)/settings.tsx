@@ -18,9 +18,10 @@ import { useTheme } from "@react-navigation/native";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
-
   const { setTheme } = useThemeManager();
-  const { colors } = useTheme(); // <-- KJO ËSHTË THELBËSORE
+
+  // Nga React Navigation Theme
+  const { dark: isDark, colors } = useTheme();
 
   const [themeModalVisible, setThemeModalVisible] = React.useState(false);
 
@@ -63,15 +64,33 @@ export default function SettingsScreen() {
         key={option.id}
         entering={FadeInDown.delay(index * 100).springify()}
       >
-        <Pressable style={styles.optionCard} onPress={option.action}>
-          <View style={styles.optionIcon}>
-            <IconSymbol
-              name={option.icon}
-              size={32}
-              color={Colors[colorScheme ?? "light"].tint}
-            />
+        <Pressable
+          style={[
+            styles.optionCard,
+            {
+              backgroundColor: isDark ? "#111" : "#F5F5F5",
+              borderColor: isDark ? "#222" : "#E5E5E5",
+              borderWidth: 1,
+            },
+          ]}
+          onPress={option.action}
+        >
+          <View
+            style={[
+              styles.optionIcon,
+              {
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.12)"
+                  : "rgba(49,130,206,0.15)",
+              },
+            ]}
+          >
+            <IconSymbol name={option.icon} size={28} color={colors.primary} />
           </View>
-          <ThemedText style={styles.optionTitle}>{option.title}</ThemedText>
+
+          <ThemedText style={[styles.optionTitle, { color: colors.text }]}>
+            {option.title}
+          </ThemedText>
         </Pressable>
       </Animated.View>
     );
@@ -82,8 +101,13 @@ export default function SettingsScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
-        <ThemedText style={styles.headerTitle}>Settings</ThemedText>
-        <ThemedText style={styles.headerSubtitle}>
+        <ThemedText style={[styles.headerTitle, { color: colors.text }]}>
+          Settings
+        </ThemedText>
+
+        <ThemedText
+          style={[styles.headerSubtitle, { color: colors.textSecondary }]}
+        >
           Customize your app experience
         </ThemedText>
       </Animated.View>
@@ -111,13 +135,18 @@ export default function SettingsScreen() {
         >
           <View
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: isDark ? "#222" : "#fff",
               borderRadius: 12,
               padding: 20,
             }}
           >
             <Text
-              style={{ fontSize: 20, fontWeight: "bold", marginBottom: 20 }}
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                marginBottom: 20,
+                color: isDark ? "#fff" : "#000",
+              }}
             >
               Choose Theme
             </Text>
@@ -128,7 +157,13 @@ export default function SettingsScreen() {
                 setThemeModalVisible(false);
               }}
             >
-              <Text style={{ fontSize: 18, paddingVertical: 10 }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  paddingVertical: 10,
+                  color: isDark ? "#fff" : "#000",
+                }}
+              >
                 🌞 Light Mode
               </Text>
             </TouchableOpacity>
@@ -139,7 +174,13 @@ export default function SettingsScreen() {
                 setThemeModalVisible(false);
               }}
             >
-              <Text style={{ fontSize: 18, paddingVertical: 10 }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  paddingVertical: 10,
+                  color: isDark ? "#fff" : "#000",
+                }}
+              >
                 🌙 Dark Mode
               </Text>
             </TouchableOpacity>
@@ -150,7 +191,13 @@ export default function SettingsScreen() {
                 setThemeModalVisible(false);
               }}
             >
-              <Text style={{ fontSize: 18, paddingVertical: 10 }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  paddingVertical: 10,
+                  color: isDark ? "#fff" : "#000",
+                }}
+              >
                 🖥 System Default
               </Text>
             </TouchableOpacity>
@@ -164,7 +211,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
   header: {
     paddingHorizontal: 20,
@@ -191,16 +237,14 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 16,
     borderRadius: 12,
-    padding: 10,
-    backgroundColor: Colors.light.card,
+    padding: 12,
     flexDirection: "row",
     alignItems: "center",
   },
   optionIcon: {
     marginRight: 16,
     padding: 8,
-    backgroundColor: Colors.light.tint + "20",
-    borderRadius: 8,
+    borderRadius: 10,
   },
   optionTitle: {
     fontSize: 18,
