@@ -1,114 +1,103 @@
-import { StyleSheet, Pressable, View } from 'react-native';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import React from "react";
+import { StyleSheet, Pressable, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@react-navigation/native";
+import { useThemeManager } from "@/contexts/ThemeContext";
 
 export default function CreateScreen() {
-  const colorScheme = useColorScheme();
+  const { colors } = useThemeManager();
+  const theme = useTheme();
+  const palette = theme.dark ? colors.dark : colors.light;
 
-  console.log('CreateScreen: Starting animations');
+  const styles = createStyles(palette);
 
   return (
-    <ThemedView style={styles.container}>
-      <Animated.View
-        entering={FadeInUp.springify()}
-        style={styles.photoPlaceholder}
-      >
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: palette.background }}
+      edges={["top"]}
+    >
+      <View style={styles.container}>
         <Animated.View
-          entering={FadeInDown.delay(100).springify()}
-          style={[styles.textButton, { marginTop: '40%' }]}
+          entering={FadeInUp.springify()}
+          style={styles.photoPlaceholder}
         >
-          <Pressable>
-            <IconSymbol
-              size={24}
-              name="text"
-              color={Colors[colorScheme ?? 'light'].tint}
-            />
-          </Pressable>
-        </Animated.View>
+          <Animated.View
+            entering={FadeInDown.delay(100).springify()}
+            style={[styles.textButton, { marginTop: "40%" }]}
+          >
+            <Pressable onPress={() => console.log("Text button pressed")}>
+              <IconSymbol size={24} name="text" color={palette.primary} />
+            </Pressable>
+          </Animated.View>
 
-        <Animated.View
-          entering={FadeInDown.delay(200).springify()}
-          style={[styles.cameraButton, { marginTop: 10 }]}
-        >
-          <Pressable>
-            <IconSymbol
-              size={36}
-              name="camera"
-              color={Colors[colorScheme ?? 'light'].tint}
-            />
-          </Pressable>
-        </Animated.View>
+          <Animated.View
+            entering={FadeInDown.delay(200).springify()}
+            style={[styles.cameraButton, { marginTop: 10 }]}
+          >
+            <Pressable onPress={() => console.log("Camera button pressed")}>
+              <IconSymbol size={36} name="camera" color={palette.primary} />
+            </Pressable>
+          </Animated.View>
 
-        <Animated.View
-          entering={FadeInDown.delay(300).springify()}
-          style={[styles.cameraButton, { marginTop: 10 }]}
-        >
-          <Pressable onPress={() => console.log('Plus button pressed')}>
-            <IconSymbol
-              size={48}
-              name="plus"
-              color={Colors[colorScheme ?? 'light'].tint}
-            />
-          </Pressable>
+          <Animated.View
+            entering={FadeInDown.delay(300).springify()}
+            style={[styles.cameraButton, { marginTop: 10 }]}
+          >
+            <Pressable onPress={() => console.log("Plus button pressed")}>
+              <IconSymbol size={48} name="plus" color={palette.primary} />
+            </Pressable>
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
-    </ThemedView>
+      </View>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  photoPlaceholder: {
-    width: '100%',
-    height: '90%',
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: Colors.light.tint,
-    borderRadius: 8,
-    marginVertical: 20,
-    marginTop: 0,
-    marginBottom: 40,
-    position: 'relative',
-    alignItems: 'center',
-  },
-  placeholderText: {
-    fontSize: 24,
-    fontWeight: '500',
-    marginTop: 10,
-    color: Colors.light.text,
-    textAlign: 'center',
-  },
-  textButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: Colors.light.tint,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: 5,
-  },
-  cameraButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: Colors.light.tint,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: 5,
-  },
-});
+const createStyles = (palette: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 20,
+    },
+    photoPlaceholder: {
+      width: "100%",
+      height: "90%",
+      backgroundColor: palette.card,
+      borderWidth: 2,
+      borderColor: palette.primary,
+      borderRadius: 8,
+      marginVertical: 20,
+      marginTop: 0,
+      marginBottom: 40,
+      position: "relative",
+      alignItems: "center",
+    },
+    textButton: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: palette.card,
+      borderWidth: 2,
+      borderColor: palette.primary,
+      justifyContent: "center",
+      alignItems: "center",
+      marginLeft: "auto",
+      marginRight: 5,
+    },
+    cameraButton: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: palette.card,
+      borderWidth: 2,
+      borderColor: palette.primary,
+      justifyContent: "center",
+      alignItems: "center",
+      marginLeft: "auto",
+      marginRight: 5,
+    },
+  });
